@@ -1,0 +1,26 @@
+{
+  "name": "gimmi",
+  "version": "1.0.0",
+  "description":"",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "Stijn Beeckmans <stijn.beeckmans@gmail.com>",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-ng-annotate": "^2.0.0",
+    "gulp-nodemon": "^2.2.1",
+    "gulp-sourcemaps": "^2.2.0",
+    "gulp-stylus": "^2.6.0",
+    "gulp-uglify": "^2.0.0",
+    "jwt-simple": "^0.5.0",
+    "mongoose": "^4.6.7",
+    "nodemon": "^1.11.0"
+  }
+}
