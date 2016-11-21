@@ -41,7 +41,7 @@ app.post('/api/wish', function(req, res, next){
 app.post('/api/wish/:id', function(req, res, next){
     Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
         if (err) {res.send({msg: 'Note not found'}, 404)}
-        res.send(201, doc);
+        res.status(201).json(doc);
     });
 })
 
