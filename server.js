@@ -6,6 +6,11 @@ var Wish = require('./data_models/wish-model')
 //Parse request body to json and save in req.body
 app.use(bodyParser.json())
 
+//Test to see if server is running
+app.get('/test', function (req, res) {
+  res.send('Test is succesful!')
+})
+
 //Add headers to all responses
 app.all("/api/*", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
