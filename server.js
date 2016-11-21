@@ -37,6 +37,14 @@ app.post('/api/wish', function(req, res, next){
   })
 })
 
+//Endpoint to update a wish
+app.post('/api/wish/:id', function(req, res, next){
+    Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
+        if (err) {res.send({msg: 'Note not found'}, 404)}
+        res.send(201, doc);
+    });
+})
+
 //Start up server to listen op port 3000
 var server = app.listen(3000, function(){
   console.log('Server running @ http://localhost:'+server.address().port)
