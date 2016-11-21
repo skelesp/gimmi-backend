@@ -6,6 +6,14 @@ var Wish = require('./data_models/wish-model')
 //Parse request body to json and save in req.body
 app.use(bodyParser.json())
 
+//Add headers to all responses
+app.all("/api/*", function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
+    return next();
+});
+
 //Endpoint to retrieve a collection of wishes
 app.get('/api/wishes/', function(req, res, next){
   Wish.find(function(err, wishes){
