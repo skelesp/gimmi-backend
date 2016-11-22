@@ -59,5 +59,5 @@ app.delete('/api/wish/:id', function(req,res,next){
 
 //Start up server to listen on a dynamically set port or on port 5000
 var server = app.listen(process.env.PORT || 5000, function(){
-  console.log('Server running @ http://localhost:'+server.address().port)
+  console.log('Server running @ port '+server.address().port)
 })

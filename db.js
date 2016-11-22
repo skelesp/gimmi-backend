@@ -1,6 +1,9 @@
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/gimmi', function () {
+var url = process.env.MONGOLAB_URI || 'mongodb://localhost/gimmi'
+
+mongoose.connect(url, function (err) {
+  if (err) throw (err);
   console.log('mongodb connected to gimmi database');
 });
 
