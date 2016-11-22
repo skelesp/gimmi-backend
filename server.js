@@ -15,7 +15,7 @@ app.get('/test', function (req, res) {
 app.all("/api/*", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
-    res.header("Access-Control-Allow-Methods", "GET, PUT, POST");
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
     return next();
 });
 
@@ -35,7 +35,6 @@ app.post('/api/wish', function(req, res, next){
     status: req.body.status,
     receiver: req.body.receiver
   })
-
   wish.save(function(err, wish) {
     if (err) {return next(err)}
     res.status(201).json(wish)
@@ -48,6 +47,14 @@ app.post('/api/wish/:id', function(req, res, next){
         if (err) {res.send({msg: 'Note not found'}, 404)}
         res.status(201).json(doc);
     });
+})
+
+//Endpoint to delete a wish
+app.delete('/api/wish/:id', function(req,res,next){
+  Wish.findByIdAndRemove(req.params.id, function(err, post){
+    if (err) return next(err);
+    res.json(post);
+  });
 })
 
 //Start up server to listen op port 3000
