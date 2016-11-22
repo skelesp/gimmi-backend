@@ -13,11 +13,11 @@ app.get('/test', function (req, res) {
 
 //Add headers to all responses
 app.all("/api/*", function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With");
-    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
-    return next();
-});
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With")
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
+    return next()
+})
 
 //Endpoint to retrieve a collection of wishes
 app.get('/api/wishes/', function(req, res, next){
@@ -45,19 +45,19 @@ app.post('/api/wish', function(req, res, next){
 app.post('/api/wish/:id', function(req, res, next){
     Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
         if (err) {res.send({msg: 'Note not found'}, 404)}
-        res.status(201).json(doc);
-    });
+        res.status(201).json(doc)
+    })
 })
 
 //Endpoint to delete a wish
 app.delete('/api/wish/:id', function(req,res,next){
   Wish.findByIdAndRemove(req.params.id, function(err, post){
-    if (err) return next(err);
-    res.json(post);
-  });
+    if (err) return next(err)
+    res.status(201).json(post)
+  })
 })
 
-//Start up server to listen op port 3000
-var server = app.listen(3000, function(){
+//Start up server to listen on a dynamically set port or on port 5000
+var server = app.listen(process.env.PORT || 5000, function(){
   console.log('Server running @ http://localhost:'+server.address().port)
 })
