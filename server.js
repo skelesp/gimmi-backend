@@ -7,6 +7,7 @@ var config = require('./config')
 
 // load needed mongoose data models
 var Wish = require('./data_models/wish-model')
+var Person = require('./data_models/person-model.js')
 
 // ========================
 // = Server configuration =
@@ -14,7 +15,7 @@ var Wish = require('./data_models/wish-model')
 
 // Set variables
 var port = process.env.PORT || config.api_port  //Port to access the API
-app.set('superSecret', config.secret)       //Secret variable to sign tokens
+app.set('superSecret', config.jwt_secret)       //Secret variable to sign tokens
 
 // Use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -36,48 +37,164 @@ app.all("/api/*", function (req, res, next) {
 // =================
 
 // Test route to see if server is running
-app.get('/', function (req, res) {
-  res.send('Welcome to the GIMMI api!')
+app.get('/api', function (req, res) {
+  res.send('Welcome to the GIMMI API!')
 })
 
 // --- Wish API routes ---
-// Retrieve a collection of wishes
-app.get('/api/wishes/', function(req, res, next){
-  Wish.find(function(err, wishes){
-      if (err) {return next(err)}
-      res.json(wishes)
-  })
-})
-
-// Register a wish
-app.post('/api/wish', function(req, res, next){
-  var wish = new Wish ({
-    title: req.body.title,
-    price: req.body.price,
-    status: req.body.status,
-    receiver: req.body.receiver
-  })
-  wish.save(function(err, wish) {
-    if (err) {return next(err)}
-    res.status(201).json(wish)
-  })
-})
-
-// Update a wish
-app.post('/api/wish/:id', function(req, res, next){
-    Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
-        if (err) {res.send({msg: 'Note not found'}, 404)}
-        res.status(201).json(doc)
+  // Retrieve a collection of wishes
+  app.get('/api/wishes/', function(req, res, next){
+    Wish.find(function(err, wishes){
+        if (err) {return next(err)}
+        res.json(wishes)
     })
-})
-
-// Delete a wish
-app.delete('/api/wish/:id', function(req,res,next){
-  Wish.findByIdAndRemove(req.params.id, function(err, post){
-    if (err) return next(err)
-    res.status(201).json(post)
   })
-})
+
+  // Register a wish
+  app.post('/api/wish', function(req, res, next){
+    var wish = new Wish ({
+      title: req.body.title,
+      price: req.body.price,
+      status: req.body.status,
+      receiver: req.body.receiver
+    })
+    wish.save(function(err, wish) {
+      if (err) {return next(err)}
+      res.status(201).json(wish)
+    })
+  })
+
+  // Update a wish
+  app.post('/api/wish/:id', function(req, res, next){
+      Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
+          if (err) {res.send({msg: 'Note not found'}, 404)}
+          res.status(201).json(doc)
+      })
+  })
+
+  // Delete a wish
+  app.delete('/api/wish/:id', function(req,res,next){
+    Wish.findByIdAndRemove(req.params.id, function(err, post){
+      if (err) return next(err)
+      res.status(201).json(post)
+    })
+  })
+
+// --- Person API routes ---
+  //Authenticate a person
+  app.post('/api/authenticate', function(req,res,next){
+    Person.findOne({
+      email : req.body.email
+    }, function (err, person){
+      if (err) return next(err)
+      if (!person) {
+        res.status(401).json({success: false, message: "Authentication failed. Person not found."})
+      } else if (person) {
+        //Check password
+        if (person.password != req.body.password) {
+          res.json({ success: false, message: 'Authentication failed. Wrong password'})
+        } else { // Person found and correct password
+          // Create a token
+          var token = jwt.sign(person, app.get('superSecret'), {
+            expiresIn: "24h" // expires after 24 hours
+          })
+          //Return token as json
+          res.status(200).json({
+            success: true,
+            message: 'Enjoy your token!',
+            token: token
+          })
+        }
+      }
+    })
+  })
+
+  // Register a Person
+  app.post('/api/people/', function(req,res,next){
+    // Check if there is no other person with same email
+    Person.findOne({
+      email: req.body.email
+    }, function(err, person) {
+      if (err) { // Query returned an error
+        res.json({
+          type: false,
+          data: "Error occured: " + err
+        })
+      } else {
+        if (person) { // Person with same email found
+          res.json({
+            type: false,
+            data: "User already exists!"
+          })
+        } else { // No person found with same email
+          var person = new Person({
+            firstName : req.body.firstname,
+            lastName : req.body.lastname,
+            email : req.body.email,
+            password : req.body.password
+          })
+
+          person.save(function(err, newPerson){
+            if (err) {return next(err)}
+            // Create a token
+            var token = jwt.sign(person, app.get('superSecret'), {
+              expiresIn: "24h" // expires after 24 hours
+            })
+            //Return token as json
+            res.status(201).json({
+              success: true,
+              message: 'Enjoy your token!',
+              token: token
+            })
+          })
+        }
+      }
+    })
+  })
+
+  app.use(function(req, res, next){
+    // Check if header or url or post data contains a token
+    var token = req.body.token || req.query.token || req.headers["x-access-token"]
+
+    // Decode the token
+    if (token) {
+      // Verify secret and "expiresIn"
+      jwt.verify(token, app.get('superSecret'), function(err, decoded) {
+        if (err) {
+          return res.json({success: false, message:"Failed to authenticate token."})
+        } else {
+          // Everything ok: save the decoded data for other routes
+          req.decoded = decoded
+          next()
+        }
+      })
+    } else { // no token available
+      // Return an error
+      return res.status(403).send({
+        success : false,
+        message : "No token provided"
+      })
+    }
+  })
+
+  // Get all the people registered in Gimmi
+  app.get('/api/people/', function (req,res,next){
+    Person.find({}, function(err, people){
+      if (err) {return next(err)}
+      res.json(people)
+    })
+  })
+
+  //TODO: route to verify a token
+
+// ========================
+// = Catch errors and log =
+// ========================
+
+
+process.on('uncaughtException', function(err) {
+  console.log(err);
+});
 
 // ====================
 // = start the server =
