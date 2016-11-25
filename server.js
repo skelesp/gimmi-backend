@@ -29,7 +29,12 @@ app.all("/api/*", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*")
     res.header("Access-Control-Allow-Headers", "Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With")
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE")
-    return next()
+
+    if (req.method === "OPTIONS"){
+      res.send();
+    } else {
+      return next()
+    }
 })
 
 // =================
@@ -47,20 +52,6 @@ app.get('/api', function (req, res) {
     Wish.find(function(err, wishes){
         if (err) {return next(err)}
         res.json(wishes)
-    })
-  })
-
-  // Register a wish
-  app.post('/api/wish', function(req, res, next){
-    var wish = new Wish ({
-      title: req.body.title,
-      price: req.body.price,
-      status: req.body.status,
-      receiver: req.body.receiver
-    })
-    wish.save(function(err, wish) {
-      if (err) {return next(err)}
-      res.status(201).json(wish)
     })
   })
 
@@ -92,10 +83,10 @@ app.get('/api', function (req, res) {
       } else if (person) {
         //Check password
         if (person.password != req.body.password) {
-          res.json({ success: false, message: 'Authentication failed. Wrong password'})
+          res.status(401).json({ success: false, message: 'Authentication failed. Wrong password'})
         } else { // Person found and correct password
           // Create a token
-          var token = jwt.sign(person, app.get('superSecret'), {
+          var token = jwt.sign(person.toObject(), app.get('superSecret'), {
             expiresIn: "24h" // expires after 24 hours
           })
           //Return token as json
@@ -124,7 +115,7 @@ app.get('/api', function (req, res) {
         if (person) { // Person with same email found
           res.json({
             type: false,
-            data: "User already exists!"
+            data: "User already exists"
           })
         } else { // No person found with same email
           var person = new Person({
@@ -154,7 +145,7 @@ app.get('/api', function (req, res) {
 
   app.use(function(req, res, next){
     // Check if header or url or post data contains a token
-    var token = req.body.token || req.query.token || req.headers["x-access-token"]
+    var token = req.body.token || req.query.token || req.headers["authorization"]
 
     // Decode the token
     if (token) {
@@ -170,11 +161,25 @@ app.get('/api', function (req, res) {
       })
     } else { // no token available
       // Return an error
-      return res.status(403).send({
+      return res.status(401).send({
         success : false,
         message : "No token provided"
       })
     }
+  })
+
+  // Register a wish
+  app.post('/api/wish', function(req, res, next){
+    var wish = new Wish ({
+      title: req.body.title,
+      price: req.body.price,
+      status: req.body.status,
+      receiver: req.body.receiver
+    })
+    wish.save(function(err, wish) {
+      if (err) {return next(err)}
+      res.status(201).json(wish)
+    })
   })
 
   // Get all the people registered in Gimmi
