@@ -113,24 +113,26 @@ app.get('/api', function (req, res) {
         })
       } else {
         if (person) { // Person with same email found
-          res.json({
+          //TODO: hier misschien ook controle op paswoord toevoegen : indien het klopt: token meegeven
+          console.log("user '"+person.email+"' tried to register again");
+          res.status(500).json({
             type: false,
-            data: "User already exists"
+            error: "User already exists"
           })
-        } else { // No person found with same email
+        } else { // REGISTER, because no person found with same email
           var person = new Person({
             firstName : req.body.firstname,
             lastName : req.body.lastname,
             email : req.body.email,
             password : req.body.password
           })
-
+          console.log(person.email + " is registered.");
           person.save(function(err, newPerson){
             if (err) {return next(err)}
             // Create a token
-            var token = jwt.sign(person, app.get('superSecret'), {
+            var token = jwt.sign(person.toObject(), app.get('superSecret'), {
               expiresIn: "24h" // expires after 24 hours
-            })
+            });
             //Return token as json
             res.status(201).json({
               success: true,
