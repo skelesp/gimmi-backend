@@ -98,7 +98,7 @@ app.get('/api', function (req, res) {
         }
       }
     })
-  })
+  });
 
   // Register a Person
   app.post('/api/people/', function(req,res,next){
@@ -170,7 +170,7 @@ app.get('/api', function (req, res) {
     }
   })
 
-  // Register a wish
+  // Create a wish
   app.post('/api/wish', function(req, res, next){
     var wish = new Wish ({
       title: req.body.title,
@@ -178,11 +178,25 @@ app.get('/api', function (req, res) {
       status: req.body.status,
       receiver: req.body.receiver
     })
+    
     wish.save(function(err, wish) {
       if (err) {return next(err)}
       res.status(201).json(wish)
     })
   })
+
+
+  // Get a person by ID
+  app.get('/api/people/:id', function(req,res,next){
+    Person.findOne({_id: req.params.id}, function(err, person){
+      if (err) {
+          return res.status(500).json({
+            error:"The query could not be fulfilled on the server."
+          })
+      }
+      res.status(200).json(person);
+    });
+  });
 
   // Get all the people registered in Gimmi
   app.get('/api/people/', function (req,res,next){

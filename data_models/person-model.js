@@ -1,9 +1,19 @@
-var db = require('../db')
-var Person = db.model('Person', {
+var db = require('../db');
+
+var personSchema = new db.Schema({
   firstName: {type: String, required: true},
   lastName: {type: String, required: true},
   email: {type: String, required: true},
   password: {type: String, required: true}
-})
+},
+{
+    toObject: { virtuals: true },
+    toJSON: { virtuals: true }
+});
+personSchema.virtual('fullName').get(function(){
+  return this.firstName + ' ' + this.lastName;
+});
 
-module.exports = Person
+var Person = db.model('Person', personSchema);
+
+module.exports = Person;
