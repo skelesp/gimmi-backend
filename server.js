@@ -71,7 +71,16 @@ app.get('/api', function (req, res) {
     })
   })
 
-// --- Person API routes ---
+  // --- Person API routes ---
+
+  // Get all the people registered in Gimmi
+  app.get('/api/people/', function (req,res,next){
+    Person.find({}, function(err, people){
+      if (err) {return next(err)}
+      res.json(people)
+    })
+  })
+
   //Authenticate a person
   app.post('/api/authenticate', function(req,res,next){
     Person.findOne({
@@ -178,7 +187,7 @@ app.get('/api', function (req, res) {
       status: req.body.status,
       receiver: req.body.receiver
     })
-    
+
     wish.save(function(err, wish) {
       if (err) {return next(err)}
       res.status(201).json(wish)
@@ -197,14 +206,6 @@ app.get('/api', function (req, res) {
       res.status(200).json(person);
     });
   });
-
-  // Get all the people registered in Gimmi
-  app.get('/api/people/', function (req,res,next){
-    Person.find({}, function(err, people){
-      if (err) {return next(err)}
-      res.json(people)
-    })
-  })
 
   //TODO: route to verify a token
 
