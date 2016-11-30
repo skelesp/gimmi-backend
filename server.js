@@ -55,6 +55,16 @@ app.get('/api', function (req, res) {
     })
   })
 
+  /*
+  // Example of population of a wish
+  Wish.findOne({ title: "Test3"})
+      .populate('createdBy receiver')
+      .exec(function(err, wish) {
+        if (err) return next(err);
+        console.log(wish);
+      })
+  */
+  
   // Update a wish
   app.post('/api/wish/:id', function(req, res, next){
       Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
@@ -183,11 +193,12 @@ app.get('/api', function (req, res) {
   app.post('/api/wish', function(req, res, next){
     var wish = new Wish ({
       title: req.body.title,
-      price: req.body.price,
+      price: parseInt(req.body.price, 10),
       status: req.body.status,
-      receiver: req.body.receiver
+      receiver: req.body.receiver,
+      createdBy: req.body.createdBy
     })
-
+    console.log(wish);
     wish.save(function(err, wish) {
       if (err) {return next(err)}
       res.status(201).json(wish)
