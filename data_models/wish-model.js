@@ -4,6 +4,7 @@ var WishSchema = new db.Schema(
   {
     title: {type: String, required: true},
     price: {type: Number, required: true},
+    url: {type: String, required: false},
     status: {type: String, default: "free"},
     receiver: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     createdBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},

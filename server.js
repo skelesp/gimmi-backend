@@ -64,7 +64,7 @@ app.get('/api', function (req, res) {
         console.log(wish);
       })
   */
-  
+
   // Update a wish
   app.post('/api/wish/:id', function(req, res, next){
       Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
@@ -194,6 +194,7 @@ app.get('/api', function (req, res) {
     var wish = new Wish ({
       title: req.body.title,
       price: parseInt(req.body.price, 10),
+      url: req.body.url,
       status: req.body.status,
       receiver: req.body.receiver,
       createdBy: req.body.createdBy
