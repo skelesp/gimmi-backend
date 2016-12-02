@@ -173,7 +173,8 @@ app.get('/api', function (req, res) {
       // Verify secret and "expiresIn"
       jwt.verify(token, app.get('superSecret'), function(err, decoded) {
         if (err) {
-          return res.json({success: false, message:"Failed to authenticate token."})
+          console.log("Failed to verify token:", token);
+          return res.status(401).json({success: false, message:"Failed to authenticate token. Token could be expired or wrong."})
         } else {
           // Everything ok: save the decoded data for other routes
           req.decoded = decoded
