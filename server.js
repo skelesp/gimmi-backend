@@ -49,10 +49,12 @@ app.get('/api', function (req, res) {
 // --- Wish API routes ---
   // Retrieve a collection of wishes
   app.get('/api/wishes/', function(req, res, next){
-    Wish.find(function(err, wishes){
-        if (err) {return next(err)}
-        res.json(wishes)
-    })
+    Wish.find()
+        .populate('reservedBy')
+        .exec( function(err, wishes){
+          if (err) {return next(err)}
+          res.json(wishes)
+        })
   })
 
   /*
@@ -67,10 +69,12 @@ app.get('/api', function (req, res) {
 
   // Update a wish
   app.post('/api/wish/:id', function(req, res, next){
-      Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, function(err, doc){
-          if (err) {res.send({msg: 'Note not found'}, 404)}
-          res.status(201).json(doc)
-      })
+      Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true})
+          .populate('reservedBy')
+          .exec( function(err, doc){
+            if (err) {res.send({msg: 'Wish not found'}, 404)}
+            res.status(201).json(doc)
+          });
   })
 
   // Delete a wish
