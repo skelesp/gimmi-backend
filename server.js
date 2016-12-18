@@ -98,7 +98,7 @@ app.get('/api', function (req, res) {
   //Authenticate a person
   app.post('/api/authenticate', function(req,res,next){
     Person.findOne({
-      email : req.body.email
+      email : req.body.email.toLowerCase()
     }, function (err, person){
       if (err) return next(err)
       if (!person) {
@@ -127,7 +127,7 @@ app.get('/api', function (req, res) {
   app.post('/api/people/', function(req,res,next){
     // Check if there is no other person with same email
     Person.findOne({
-      email: req.body.email
+      email: req.body.email.toLowerCase()
     }, function(err, person) {
       if (err) { // Query returned an error
         res.json({
@@ -146,7 +146,7 @@ app.get('/api', function (req, res) {
           var person = new Person({
             firstName : req.body.firstname,
             lastName : req.body.lastname,
-            email : req.body.email,
+            email : req.body.email.toLowerCase(),
             password : req.body.password
           })
           console.log(person.email + " is registered.");
