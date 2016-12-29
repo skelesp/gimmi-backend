@@ -200,6 +200,7 @@ app.get('/api', function (req, res) {
       title: req.body.title,
       price: parseInt(req.body.price, 10),
       url: req.body.url,
+      image: req.body.image,
       status: req.body.status,
       receiver: req.body.receiver,
       createdBy: req.body.createdBy
