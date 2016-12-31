@@ -1,9 +1,10 @@
-var express = require ('express')
-var app = express()
-var bodyParser = require('body-parser')
-var morgan = require('morgan')
-var jwt = require('jsonwebtoken')
-var config = require('./config')
+var express = require ('express');
+var app = express();
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+var jwt = require('jsonwebtoken');
+var config = require('./config');
+var request = require('request');
 
 // load needed mongoose data models
 var Wish = require('./data_models/wish-model')
@@ -22,7 +23,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // Log all requests with morgan
-app.use(morgan('dev'))
+app.use(morgan(':date[clf] :method :url :status :response-time ms - :res[content-length]'))
 
 // Add headers to all responses to prevent CORS errors
 app.all("/api/*", function (req, res, next) {
@@ -41,10 +42,20 @@ app.all("/api/*", function (req, res, next) {
 // = Server routes =
 // =================
 
+// Google Custom Search route
+app.get('/api/gcse/:search/', function(req, res) {
+  url = "https://www.googleapis.com/customsearch/v1?key=" + process.env.GOOGLE_API_KEY + "&cx=" + process.env.GOOGLE_CSE_ID + "&q=lamzac"
+
+  request.get(url, function(err, response, body) {
+    if (err) return next(err)
+    res.json(JSON.parse(body).items);
+  });
+});
+
 // Test route to see if server is running
 app.get('/api', function (req, res) {
-  res.send('Welcome to the GIMMI API!')
-})
+  res.send('Welcome to the GIMMI API!');
+});
 
 // --- Wish API routes ---
   // Retrieve a collection of wishes
@@ -205,7 +216,6 @@ app.get('/api', function (req, res) {
       receiver: req.body.receiver,
       createdBy: req.body.createdBy
     })
-    console.log(wish);
     wish.save(function(err, wish) {
       if (err) {return next(err)}
       res.status(201).json(wish)
