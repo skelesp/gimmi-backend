@@ -3,7 +3,7 @@ var db = require('../db')
 var WishSchema = new db.Schema(
   {
     title: {type: String, required: true},
-    price: {type: Number, required: true},
+    price: {type: Number, required: false},
     url: {type: String, required: false},
     image: {type: String, required: false},
     status: {type: String, default: "free"},
