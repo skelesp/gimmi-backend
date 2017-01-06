@@ -44,7 +44,7 @@ app.all("/api/*", function (req, res, next) {
 
 // Google Custom Search route
 app.get('/api/gcse/:search/', function(req, res) {
-  url = "https://www.googleapis.com/customsearch/v1?key=" + process.env.GOOGLE_API_KEY + "&cx=" + process.env.GOOGLE_CSE_ID + "&q=lamzac"
+  url = "https://www.googleapis.com/customsearch/v1?key=" + process.env.GOOGLE_API_KEY + "&cx=" + process.env.GOOGLE_CSE_ID + "&q=" + req.params.search;
 
   request.get(url, function(err, response, body) {
     if (err) return next(err)
