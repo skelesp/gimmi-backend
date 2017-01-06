@@ -207,9 +207,10 @@ app.get('/api', function (req, res) {
 
   // Create a wish
   app.post('/api/wish', function(req, res, next){
+    console.log(req.body);
     var wish = new Wish ({
       title: req.body.title,
-      price: parseInt(req.body.price, 10),
+      price: parseInt(req.body.price, 10) || null,
       url: req.body.url,
       image: req.body.image,
       status: req.body.status,
