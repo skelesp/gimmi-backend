@@ -162,6 +162,7 @@ app.get('/api', function (req, res) {
             firstName : req.body.firstname,
             lastName : req.body.lastname,
             email : req.body.email.toLowerCase(),
+            birthday : req.body.birthday,
             password : req.body.password
           })
           console.log(person.email + " is registered.");
