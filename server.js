@@ -8,7 +8,7 @@ var request = require('request');
 
 // load needed mongoose data models
 var Wish = require('./data_models/wish-model')
-var Person = require('./data_models/person-model.js')
+var Person = require('./data_models/person-model')
 
 // ========================
 // = Server configuration =
@@ -115,7 +115,7 @@ app.get('/api', function (req, res) {
     Person.findOne({
       email : req.body.email.toLowerCase()
     }, function (err, person){
-      if (err) return next(err)
+      if (err) return next(err);
       if (!person) {
         res.status(401).json({success: false, message: "Authentication failed. Person not found."})
       } else if (person) {
@@ -166,7 +166,7 @@ app.get('/api', function (req, res) {
             password : req.body.password
           })
           console.log(person.email + " is registered.");
-          person.save(function(err, newPerson){
+          person.save(function(err){
             if (err) {return next(err)}
             // Create a token
             var token = jwt.sign(person.toObject(), app.get('superSecret'), {
