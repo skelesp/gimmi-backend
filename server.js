@@ -112,30 +112,35 @@ app.get('/api', function (req, res) {
 
   //Authenticate a person
   app.post('/api/authenticate', function(req,res,next){
-    Person.findOne({
-      email : req.body.email.toLowerCase()
-    }, function (err, person){
+    Person.findOne({ email : req.body.email.toLowerCase() }, function (err, person){
       if (err) return next(err);
+
       if (!person) {
-        res.status(401).json({success: false, message: "Authentication failed. Person not found."})
-      } else if (person) {
+        res.status(401).json({success: false, message: "Authentication failed."})
+      } else {
         //Check password
-        if (person.password != req.body.password) {
-          res.status(401).json({ success: false, message: 'Authentication failed. Wrong password'})
-        } else { // Person found and correct password
-          // Create a token
-          var token = jwt.sign(person.toObject(), app.get('superSecret'), {
-            expiresIn: "24h" // expires after 24 hours
-          })
-          //Return token as json
-          res.status(200).json({
-            success: true,
-            message: 'Enjoy your token!',
-            token: token
-          })
-        }
+        person.comparePassword(req.body.password, function(err, isMatch){
+          if (err) next(err);
+
+          if (!isMatch) {
+            res.status(401).json({ success: false, message: 'Authentication failed.'})
+          } else { // Person found and correct password
+
+            // Create a token
+            var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+              expiresIn: "24h" // expires after 24 hours
+            })
+
+            //Return token as json
+            res.status(200).json({
+              success: true,
+              message: 'Enjoy your token!',
+              token: token
+            })
+          }
+        });
       }
-    })
+    });
   });
 
   // Register a Person
