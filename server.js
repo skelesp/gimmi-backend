@@ -123,7 +123,7 @@ app.get('/api', function (req, res) {
           if (err) next(err);
 
           if (!isMatch) {
-            res.status(401).json({ success: false, message: 'Authentication failed.'})
+            res.status(401).json({ success: false, message: 'Authentication failed!'})
           } else { // Person found and correct password
 
             // Create a token
