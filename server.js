@@ -104,7 +104,7 @@ app.get('/api', function (req, res) {
 
   // Get all the people registered in Gimmi
   app.get('/api/people/', function (req,res,next){
-    Person.find({}, function(err, people){
+    Person.find({}, 'firstName lastName', function(err, people){
       if (err) {return next(err)}
       res.json(people)
     })
