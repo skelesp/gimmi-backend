@@ -5,6 +5,7 @@ var morgan = require('morgan');
 var jwt = require('jsonwebtoken');
 var config = require('./config');
 var request = require('request');
+var mongoose = require('mongoose');
 
 // load needed mongoose data models
 var Wish = require('./data_models/wish-model')
@@ -62,14 +63,22 @@ app.get('/api', function (req, res) {
 });
 
 // --- Wish API routes ---
-  // Retrieve a collection of wishes
-  app.get('/api/wishes/', function(req, res, next){
-    Wish.find()
-        .populate('reservedBy')
-        .exec( function(err, wishes){
-          if (err) {return next(err)}
-          res.json(wishes)
-        })
+  // Retrieve a wishlist
+  app.get('/api/wishlist/:receiverId', function(req, res, next){
+    Wish.aggregate([
+      {$match: {receiver: new mongoose.Types.ObjectId(req.params.receiverId)} },
+      { $group: {
+       _id: {receiverID: "$receiver"},
+       wishes: {$push: {_id: "$_id", title: "$title", image: "$image", status: "$status", price: "$price", createdBy: "$createdBy", reservedBy: "$reservedBy"}},
+       count: {$sum: 1}
+      }}
+    ])
+    .exec( function(err, wishes){
+      if (err) {
+        return next(err)
+      }
+      res.json(wishes)
+    })
   })
 
   /*
