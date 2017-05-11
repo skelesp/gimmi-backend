@@ -81,15 +81,13 @@ app.get('/api', function (req, res) {
     })
   })
 
-  /*
-  // Example of population of a wish
-  Wish.findOne({ title: "Test3"})
-      .populate('createdBy receiver')
-      .exec(function(err, wish) {
-        if (err) return next(err);
-        console.log(wish);
-      })
-  */
+  // Get a wish
+  app.get('/api/wish/:id', function(req, res, next){
+    Wish.find({_id: req.params.id}, function(err, result){
+      if (err) return next (err);
+      res.status(200).json(result);
+    });
+  });
 
   // Update a wish
   app.post('/api/wish/:id', function(req, res, next){
