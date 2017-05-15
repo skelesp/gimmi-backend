@@ -1,4 +1,10 @@
 var db = require('../db')
+var reservationSchema = new db.Schema({
+  reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false},
+  amount: {type: Number, required: true},
+  reservationDate: {type: Date, required: true},
+  reason: {type: String, required: false}
+});
 
 var WishSchema = new db.Schema(
   {
@@ -6,10 +12,12 @@ var WishSchema = new db.Schema(
     price: {type: Number, required: false},
     url: {type: String, required: false},
     image: {type: String, required: false},
+    amountWanted: {type: Number, default: 1},
     status: {type: String, default: "free"},
     receiver: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     createdBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
-    reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false}
+    reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false},
+    reservation: {type: reservationSchema, required: false}
   },
   {
     timestamps: true

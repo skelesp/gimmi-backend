@@ -99,6 +99,20 @@ app.get('/api', function (req, res) {
           });
   })
 
+  app.put('/api/wish/:id/reservation', function(req, res, next){
+    Wish.findOneAndUpdate({_id: req.params.id},
+          {reservation: {reservedBy: '591a072ecf06483a8cbb6e5e',
+                        amount: 1,
+                        reservationDate: Date.now(),
+                        reason: "Housewarming"}
+          },
+        {new: true})
+    .exec( function(err, doc){
+      if (err) {res.send({msg: 'Reservation failed'}, 404)}
+      res.status(201).json(doc)
+    });
+  });
+
   // Delete a wish
   app.delete('/api/wish/:id', function(req,res,next){
     Wish.findByIdAndRemove(req.params.id, function(err, post){
