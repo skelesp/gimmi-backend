@@ -69,7 +69,7 @@ app.get('/api', function (req, res) {
       {$match: {receiver: new mongoose.Types.ObjectId(req.params.receiverId)} },
       { $group: {
        _id: {receiverID: "$receiver"},
-       wishes: {$push: {_id: "$_id", title: "$title", image: "$image", status: "$status", price: "$price", createdBy: "$createdBy", reservedBy: "$reservedBy"}},
+       wishes: {$push: {_id: "$_id", title: "$title", image: "$image", price: "$price", createdBy: "$createdBy", reservation: "$reservation"}},
        count: {$sum: 1}
       }}
     ])
@@ -95,23 +95,34 @@ app.get('/api', function (req, res) {
           .populate('reservedBy')
           .exec( function(err, doc){
             if (err) {res.send({msg: 'Wish not found'}, 404)}
-            res.status(201).json(doc)
+            res.status(201).json(doc);
           });
   })
-
-  app.put('/api/wish/:id/reservation', function(req, res, next){
+// Reservation API - POST
+  app.post('/api/wish/:id/reservation', function(req, res, next){
     Wish.findOneAndUpdate({_id: req.params.id},
-          {reservation: {reservedBy: '591a072ecf06483a8cbb6e5e',
+          {reservation: {reservedBy: req.body.reservator,
                         amount: 1,
                         reservationDate: Date.now(),
-                        reason: "Housewarming"}
+                        reason: req.body.reason}
           },
         {new: true})
     .exec( function(err, doc){
-      if (err) {res.send({msg: 'Reservation failed'}, 404)}
-      res.status(201).json(doc)
+      if (err) {res.send({msg: 'Reservation failed'}, 404);}
+      res.status(201).json(doc);
     });
   });
+// Reservation API - DELETE
+  app.delete('/api/wish/:id/reservation', function(req, res, next){
+    console.log("Delete reservation for" + req.params.id);
+    Wish.findOneAndUpdate({_id : req.params.id}, {$unset: { reservation: "" }}, {new: true})
+    .exec(function(err, doc) {
+      if (err) {res.send({msg: 'Reservation delete failed'}, 404);}
+      res.status(201).json(doc);
+    });
+  });
+// Reservation API - GET
+// Reservation API - PUT
 
   // Delete a wish
   app.delete('/api/wish/:id', function(req,res,next){
