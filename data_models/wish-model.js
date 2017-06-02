@@ -13,7 +13,6 @@ var WishSchema = new db.Schema(
     url: {type: String, required: false},
     image: {type: String, required: false},
     amountWanted: {type: Number, default: 1},
-    status: {type: String, default: "free"},
     receiver: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     createdBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false},

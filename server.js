@@ -73,11 +73,16 @@ app.get('/api', function (req, res) {
        count: {$sum: 1}
       }}
     ])
-    .exec( function(err, wishes){
-      if (err) {
-        return next(err)
+    .exec( function(err, wishlist){
+      if (err) {return next(err)}
+      if (!Array.isArray(wishlist) || !wishlist.length) {
+          wishlist = [{
+            _id: {receiverID: req.params.receiverId},
+            count: 0,
+            wishes: []
+          }];
       }
-      res.json(wishes)
+      res.json(wishlist)
     })
   })
 
@@ -114,7 +119,6 @@ app.get('/api', function (req, res) {
   });
 // Reservation API - DELETE
   app.delete('/api/wish/:id/reservation', function(req, res, next){
-    console.log("Delete reservation for" + req.params.id);
     Wish.findOneAndUpdate({_id : req.params.id}, {$unset: { reservation: "" }}, {new: true})
     .exec(function(err, doc) {
       if (err) {res.send({msg: 'Reservation delete failed'}, 404);}
@@ -254,12 +258,14 @@ app.get('/api', function (req, res) {
       price: parseInt(req.body.price, 10) || null,
       url: req.body.url,
       image: req.body.image,
-      status: req.body.status,
       receiver: req.body.receiver,
       createdBy: req.body.createdBy
-    })
+    });
     wish.save(function(err, wish) {
-      if (err) {return next(err)}
+      if (err) {
+        console.log(err);
+        return next(err);
+      }
       res.status(201).json(wish)
     })
   })
