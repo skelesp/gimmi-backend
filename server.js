@@ -106,9 +106,9 @@ app.get('/api', function (req, res) {
 // Reservation API - POST
   app.post('/api/wish/:id/reservation', function(req, res, next){
     Wish.findOneAndUpdate({_id: req.params.id},
-          {reservation: {reservedBy: req.body.reservator,
-                        amount: 1,
-                        reservationDate: Date.now(),
+          {reservation: {reservedBy: req.body.reservedBy,
+                        amount: req.body.amount,
+                        reservationDate: req.body.reservationDate,
                         reason: req.body.reason}
           },
         {new: true})
