@@ -67,11 +67,18 @@ app.get('/api', function (req, res) {
   app.get('/api/wishlist/:receiverId', function(req, res, next){
     Wish.aggregate([
       {$match: {receiver: new mongoose.Types.ObjectId(req.params.receiverId)} },
-      { $group: {
+     { $group: {
        _id: {receiverID: "$receiver"},
-       wishes: {$push: {_id: "$_id", title: "$title", image: "$image", price: "$price", createdBy: "$createdBy", reservation: "$reservation"}},
+       wishes: {$push: {
+         _id: "$_id",
+         title: "$title",
+         image: "$image",
+         price: "$price",
+         createdAt: "$createdAt",
+         createdBy: "$createdBy",
+         reservation: "$reservation"}},
        count: {$sum: 1}
-      }}
+     }}
     ])
     .exec( function(err, wishlist){
       if (err) {return next(err)}
@@ -88,7 +95,9 @@ app.get('/api', function (req, res) {
 
   // Get a wish
   app.get('/api/wish/:id', function(req, res, next){
-    Wish.find({_id: req.params.id}, function(err, result){
+    Wish.find({_id: req.params.id})
+        .populate('createdBy reservation.reservedBy')
+        .exec( function(err, result){
       if (err) return next (err);
       res.status(200).json(result);
     });
@@ -97,7 +106,7 @@ app.get('/api', function (req, res) {
   // Update a wish
   app.post('/api/wish/:id', function(req, res, next){
       Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true})
-          .populate('reservedBy')
+          .populate('createdBy')
           .exec( function(err, doc){
             if (err) {res.send({msg: 'Wish not found'}, 404)}
             res.status(201).json(doc);
