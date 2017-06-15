@@ -108,6 +108,7 @@ app.get('/api', function (req, res) {
       Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true})
           .populate('createdBy')
           .exec( function(err, doc){
+            console.log(doc);
             if (err) {res.send({msg: 'Wish not found'}, 404)}
             res.status(201).json(doc);
           });
@@ -267,6 +268,10 @@ app.get('/api', function (req, res) {
       price: parseInt(req.body.price, 10) || null,
       url: req.body.url,
       image: req.body.image,
+      size: req.body.size,
+      color:  req.body.color,
+      description:  req.body.description,
+      amountWanted:  req.body.amountWanted,
       receiver: req.body.receiver,
       createdBy: req.body.createdBy
     });
