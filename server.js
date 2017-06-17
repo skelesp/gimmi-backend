@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken');
 var config = require('./config');
 var request = require('request');
 var mongoose = require('mongoose');
+var _ = require('lodash');
 
 // load needed mongoose data models
 var Wish = require('./data_models/wish-model')
@@ -103,14 +104,25 @@ app.get('/api', function (req, res) {
     });
   });
 
+  function convertNovalueToUndefined (object) {
+		return _.mapValues(object, function(value){
+			if (value === "#*/NO_VALUE/*#") {
+				return value = undefined;
+			} else {
+				return value;
+			}
+		});
+  }
+
   // Update a wish
   app.post('/api/wish/:id', function(req, res, next){
-      Wish.findOneAndUpdate({_id: req.params.id}, req.body, {new: true})
-          .populate('createdBy')
-          .exec( function(err, doc){
-            if (err) {res.send({msg: 'Wish not found'}, 404)}
-            res.status(201).json(doc);
-          });
+    var wish = convertNovalueToUndefined(req.body);
+    Wish.findOneAndUpdate({_id: req.params.id}, wish, {new: true})
+        .populate('createdBy')
+        .exec( function(err, doc){
+          if (err) {res.send({msg: 'Wish not found'}, 404)}
+          res.status(201).json(doc);
+        });
   })
 // Reservation API - POST
   app.post('/api/wish/:id/reservation', function(req, res, next){
@@ -267,6 +279,10 @@ app.get('/api', function (req, res) {
       price: parseInt(req.body.price, 10) || null,
       url: req.body.url,
       image: req.body.image,
+      size: req.body.size,
+      color:  req.body.color,
+      description:  req.body.description,
+      amountWanted:  req.body.amountWanted,
       receiver: req.body.receiver,
       createdBy: req.body.createdBy
     });
