@@ -115,7 +115,7 @@ app.get('/api', function (req, res) {
   }
 
   // Update a wish
-  app.post('/api/wish/:id', function(req, res, next){
+  app.put('/api/wish/:id', function(req, res, next){
     var wish = convertNovalueToUndefined(req.body);
     Wish.findOneAndUpdate({_id: req.params.id}, wish, {new: true})
         .populate('createdBy')
