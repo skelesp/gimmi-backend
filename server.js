@@ -6,6 +6,7 @@ var jwt = require('jsonwebtoken');
 var config = require('./config');
 var request = require('request');
 var mongoose = require('mongoose');
+var util = require('util');
 var _ = require('lodash');
 
 // load needed mongoose data models
@@ -67,21 +68,39 @@ app.get('/api', function (req, res) {
   // Retrieve a wishlist
   app.get('/api/wishlist/:receiverId', function(req, res, next){
     Wish.aggregate([
-      {$match: {receiver: new mongoose.Types.ObjectId(req.params.receiverId)} },
-     { $group: {
-       _id: {receiverID: "$receiver"},
-       wishes: {$push: {
-         _id: "$_id",
-         title: "$title",
-         image: "$image",
-         price: "$price",
-         createdAt: "$createdAt",
-         createdBy: "$createdBy",
-         reservation: "$reservation"}},
-       count: {$sum: 1}
-     }}
-    ])
-    .exec( function(err, wishlist){
+      { $match: { receiver: new mongoose.Types.ObjectId(req.params.receiverId) } },
+      {
+        $lookup: {
+          from: "people",
+          localField: "createdBy",
+          foreignField: "_id",
+          as: "creator"
+        }
+      },
+      {
+        $group: {
+          _id: { receiverID: "$receiver" },
+          wishes: {
+            $push: {
+              _id: "$_id",
+              title: "$title",
+              image: "$image",
+              price: "$price",
+              createdAt: "$createdAt",
+              createdBy: "$createdBy",
+              reservation: "$reservation",
+              creator: "$creator"
+            }
+          },
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          "wishes.creator": { "email": 0, "password": 0 }
+        }
+      }
+    ]).exec( function(err, wishlist){
       if (err) {return next(err)}
       if (!Array.isArray(wishlist) || !wishlist.length) {
           wishlist = [{
@@ -274,7 +293,7 @@ app.get('/api', function (req, res) {
 
   // Create a wish
   app.post('/api/wish', function(req, res, next){
-    var wish = new Wish ({
+   var wish = new Wish ({
       title: req.body.title,
       price: parseInt(req.body.price, 10) || null,
       url: req.body.url,
