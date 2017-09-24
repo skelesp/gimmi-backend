@@ -72,13 +72,14 @@ app.get('/api', function (req, res) {
     Wish.aggregate([
       { $match: { receiver: new mongoose.Types.ObjectId(req.params.receiverId) } },
       {
-        $lookup: {
+        $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
           from: "people",
           localField: "createdBy",
           foreignField: "_id",
           as: "creator"
         }
       },
+      {$unwind: "$creator"},
       {
         $group: {
           _id: { receiverID: "$receiver" },
@@ -89,9 +90,8 @@ app.get('/api', function (req, res) {
               image: "$image",
               price: "$price",
               createdAt: "$createdAt",
-              createdBy: "$createdBy",
-              reservation: "$reservation",
-              creator: "$creator"
+              createdBy: "$creator",
+              reservation: "$reservation"
             }
           },
           count: { $sum: 1 }
@@ -99,7 +99,7 @@ app.get('/api', function (req, res) {
       },
       {
         $project: {
-          "wishes.creator": { "email": 0, "password": 0 }
+          "wishes.createdBy": { "email": 0, "password": 0 }
         }
       }
     ]).exec( function(err, wishlist){
@@ -118,7 +118,7 @@ app.get('/api', function (req, res) {
   // Get a wish
   app.get('/api/wish/:id', function(req, res, next){
     Wish.find({_id: req.params.id})
-        .populate('createdBy reservation.reservedBy')
+        .populate('createdBy reservation.reservedBy', 'firstName lastName')
         .exec( function(err, result){
       if (err) return next (err);
       res.status(200).json(result);
@@ -139,7 +139,7 @@ app.get('/api', function (req, res) {
   app.put('/api/wish/:id', function(req, res, next){
     var wish = convertNovalueToUndefined(req.body);
     Wish.findOneAndUpdate({_id: req.params.id}, wish, {new: true})
-        .populate('createdBy')
+        .populate('createdBy', 'firstName lastName')
         .exec( function(err, doc){
           if (err) {res.send({msg: 'Wish not found'}, 404)}
           res.status(201).json(doc);
@@ -312,7 +312,9 @@ app.get('/api', function (req, res) {
         console.log(err);
         return next(err);
       }
-      res.status(201).json(wish)
+      Wish.populate(wish, {path: "createdBy", select:{ 'password': 0, 'email': 0 } }, function (err, wish){
+        res.status(201).json(wish)
+      });
     })
   })
 
