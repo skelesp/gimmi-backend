@@ -3,22 +3,22 @@
   "version": "1.0.0",
   "author": "Stijn Beeckmans <stijn.beeckmans@gmail.com>",
   "dependencies": {
-    "bcrypt": "^1.0.2",
-    "body-parser": "^1.15.2",
-    "express": "^4.14.0",
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "express": "^4.15.5",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
     "gulp-ng-annotate": "^2.0.0",
     "gulp-nodemon": "^2.2.1",
-    "gulp-sourcemaps": "^2.2.0",
+    "gulp-sourcemaps": "^2.6.1",
     "gulp-stylus": "^2.6.0",
     "gulp-uglify": "^2.0.0",
-    "jsonwebtoken": "^7.1.9",
+    "jsonwebtoken": "^7.4.3",
     "jwt-simple": "^0.5.0",
     "lodash": "^4.17.4",
-    "mongoose": "^4.9.8",
-    "morgan": "^1.7.0",
-    "nodemon": "^1.11.0",
-    "request": "^2.79.0"
+    "mongoose": "^4.11.13",
+    "morgan": "^1.8.2",
+    "nodemon": "^1.12.1",
+    "request": "^2.82.0"
   }
 }
