@@ -154,6 +154,7 @@ app.get('/api', function (req, res) {
                         reason: req.body.reason}
           },
         {new: true})
+    .populate('createdBy', 'firstName lastName')
     .exec( function(err, doc){
       if (err) {res.send({msg: 'Reservation failed'}, 404);}
       res.status(201).json(doc);
@@ -162,6 +163,7 @@ app.get('/api', function (req, res) {
 // Reservation API - DELETE
   app.delete('/api/wish/:id/reservation', function(req, res, next){
     Wish.findOneAndUpdate({_id : req.params.id}, {$unset: { reservation: "" }}, {new: true})
+    .populate('createdBy', 'firstName lastName')
     .exec(function(err, doc) {
       if (err) {res.send({msg: 'Reservation delete failed'}, 404);}
       res.status(201).json(doc);
