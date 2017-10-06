@@ -155,9 +155,10 @@ app.get('/api', function (req, res) {
           },
         {new: true})
     .populate('createdBy', 'firstName lastName')
-    .populate('reservation.reservedBy')
+    .populate('reservation.reservedBy', 'firstName lastName')
     .exec( function(err, doc){
       if (err) {res.send({msg: 'Reservation failed'}, 404);}
+      console.log(doc);
       res.status(201).json(doc);
     });
   });
