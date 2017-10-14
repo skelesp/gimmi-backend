@@ -7,7 +7,25 @@ var personSchema = new db.Schema({
   lastName: {type: String, required: true},
   birthday: {type: Date, required: false},
   email: {type: String, required: true, index: { unique: true } },
-  password: {type: String, required: true}
+  accounts: {
+    type: {
+      local: {
+        type: {
+          password: { type: String, required: true }
+        },
+        required: false
+      },
+      facebook: {
+        type: {
+          id: { type: String, required: true },
+          token: { type: String, required: true },
+          profile_pic: { type: String, required: false }
+        },
+        required: false
+      } 
+    },
+    required: false
+  }  
 },
 {
     toObject: { virtuals: true },
@@ -22,25 +40,25 @@ personSchema.pre('save', function(next) {
   var person = this;
 
   // only hash the password if it has been modified (or is new)
-  if (!person.isModified('password') && person.passMigration == false) return next();
+  if ((!person.isModified('password') && person.passMigration == false) || (typeof person.accounts.local === 'undefined')) return next();
 
   // generate a salt
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
     if (err) return next(err);
 
     // hash the password using our new salt
-    bcrypt.hash(person.password, salt, function(err, hash) {
+    bcrypt.hash(person.accounts.local.password, salt, function(err, hash) {
         if (err) return next(err);
 
         // override the cleartext password with the hashed one
-        person.password = hash;
+        person.accounts.local.password = hash;
         next();
     });
   });
 });
 
 personSchema.methods.comparePassword = function(candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+  bcrypt.compare(candidatePassword, this.accounts.local.password, function(err, isMatch) {
       if (err) return cb(err);
       cb(null, isMatch);
   });
