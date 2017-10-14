@@ -99,7 +99,7 @@ app.get('/api', function (req, res) {
       },
       {
         $project: {
-          "wishes.createdBy": { "email": 0, "password": 0 }
+          "wishes.createdBy": { "email": 0, "accounts": 0 }
         }
       }
     ]).exec( function(err, wishlist){
@@ -193,35 +193,74 @@ app.get('/api', function (req, res) {
 
   //Authenticate a person
   app.post('/api/authenticate', function(req,res,next){
-    Person.findOne({ email : req.body.email.toLowerCase() }, function (err, person){
-      if (err) return next(err);
+    if (req.body.account === "local"){
+      Person.findOne({ email: req.body.email.toLowerCase() }, function (err, person) {
+        if (err) return next(err);
 
-      if (!person) {
-        res.status(401).json({success: false, message: "Authentication failed."})
-      } else {
-        //Check password
-        person.comparePassword(req.body.password, function(err, isMatch){
-          if (err) next(err);
+        if (!person) {
+          res.status(401).json({ success: false, message: "Authentication failed." })
+        } else {
+          //Check password
+          person.comparePassword(req.body.password, function (err, isMatch) {
+            if (err) next(err);
 
-          if (!isMatch) {
-            res.status(401).json({ success: false, message: 'Authentication failed!'})
-          } else { // Person found and correct password
+            if (!isMatch) {
+              res.status(401).json({ success: false, message: 'Authentication failed!' })
+            } else { // Person found and correct password
 
+              // Create a token
+              var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+                expiresIn: "24h" // expires after 24 hours
+              })
+
+              //Return token as json
+              res.status(200).json({
+                success: true,
+                message: 'Enjoy your token!',
+                token: token
+              })
+            }
+          });
+        }
+      });
+    } else if (req.body.account === "facebook") {
+      Person.findOne({ email: req.body.userInfo.email.toLowerCase() }, function (err, person) {
+        if (err) return next(err);
+        
+        if (!person) {//Create a new person with Facebook account
+          var person = new Person({
+            firstName: req.body.userInfo.first_name,
+            lastName: req.body.userInfo.last_name,
+            email: req.body.userInfo.email.toLowerCase(),
+            /* birthday: req.body.birthday, */
+            accounts: {
+              facebook: {
+                id: req.body.fb.authResponse.userID,
+                token: req.body.fb.authResponse.accessToken,
+                profile_pic: req.body.userInfo.picture.data.url
+              }
+            }
+          });
+          person.save(function (err) {
+            if (err) { return next(err) }
             // Create a token
             var token = jwt.sign(person.toObject(), app.get('superSecret'), {
               expiresIn: "24h" // expires after 24 hours
-            })
-
+            });
             //Return token as json
-            res.status(200).json({
+            res.status(201).json({
               success: true,
               message: 'Enjoy your token!',
               token: token
             })
-          }
-        });
-      }
-    });
+          })
+        } else if (!person.accounts.facebook){
+          console.log("Voeg facebookaccount toe aan de gekende user");
+        } else if (person.accounts.facebook && person.accounts.facebook.id === req.body.fb.authResponse.userID) {
+          console.log("Facebookaccount bestaat en komt overeen");
+        }
+      });
+    }
   });
 
   // Register a Person
@@ -249,8 +288,11 @@ app.get('/api', function (req, res) {
             lastName : req.body.lastname,
             email : req.body.email.toLowerCase(),
             birthday : req.body.birthday,
-            password : req.body.password
-          })
+            accounts: {
+              local: { password: req.body.password }
+            }
+          });
+          
           console.log(person.email + " is registered.");
           person.save(function(err){
             if (err) {return next(err)}
@@ -315,7 +357,7 @@ app.get('/api', function (req, res) {
         console.log(err);
         return next(err);
       }
-      Wish.populate(wish, {path: "createdBy", select:{ 'password': 0, 'email': 0 } }, function (err, wish){
+      Wish.populate(wish, {path: "createdBy", select:{ 'accounts': 0, 'email': 0 } }, function (err, wish){
         res.status(201).json(wish)
       });
     })
