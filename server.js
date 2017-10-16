@@ -217,7 +217,8 @@ app.get('/api', function (req, res) {
               res.status(200).json({
                 success: true,
                 message: 'Enjoy your token!',
-                token: token
+                token: token,
+                loginStrategy: "local"
               })
             }
           });
@@ -252,7 +253,8 @@ app.get('/api', function (req, res) {
             res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
               success: true,
               message: 'Enjoy your token!',
-              token: token
+              token: token,
+              loginStrategy: "facebook"
             });
           })
         } else if (!person.accounts.facebook){ // A person with the email linked to the facebook account, but the FB account wasn't registered yet
@@ -277,7 +279,8 @@ app.get('/api', function (req, res) {
               res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
                 success: true,
                 message: 'Enjoy your token!',
-                token: token
+                token: token,
+                loginStrategy: "facebook"
               });
             });
 
@@ -290,7 +293,8 @@ app.get('/api', function (req, res) {
           res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
             success: true,
             message: 'Enjoy your token!',
-            token: token
+            token: token,
+            loginStrategy: "facebook"
           });
         }
       });
@@ -338,7 +342,8 @@ app.get('/api', function (req, res) {
             res.status(201).json({
               success: true,
               message: 'Enjoy your token!',
-              token: token
+              token: token,
+              loginStrategy: "local"
             })
           })
         }
