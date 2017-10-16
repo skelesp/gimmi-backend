@@ -208,8 +208,12 @@ app.get('/api', function (req, res) {
               res.status(401).json({ success: false, message: 'Authentication failed!' })
             } else { // Person found and correct password
 
+              //Add loginStrategy to person object
+              personObj = person.toObject();
+              personObj.loginStrategy = "local";
+
               // Create a token
-              var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+              var token = jwt.sign(personObj, app.get('superSecret'), {
                 expiresIn: "24h" // expires after 24 hours
               })
 
@@ -217,8 +221,7 @@ app.get('/api', function (req, res) {
               res.status(200).json({
                 success: true,
                 message: 'Enjoy your token!',
-                token: token,
-                loginStrategy: "local"
+                token: token
               })
             }
           });
@@ -244,17 +247,21 @@ app.get('/api', function (req, res) {
           });
           person.save(function (err) {
             if (err) { return next(err) }
-            // Create a token
             console.info("New person added: " + person.email);
-            var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+            
+            //Add loginStrategy to person object
+            personObj = person.toObject();
+            personObj.loginStrategy = "facebook";
+
+            // Create a token
+            var token = jwt.sign(personObj, app.get('superSecret'), {
               expiresIn: "24h" // expires after 24 hours
             });
             //Return token as json
             res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
               success: true,
               message: 'Enjoy your token!',
-              token: token,
-              loginStrategy: "facebook"
+              token: token
             });
           })
         } else if (!person.accounts.facebook){ // A person with the email linked to the facebook account, but the FB account wasn't registered yet
@@ -272,29 +279,37 @@ app.get('/api', function (req, res) {
             .exec(function (err, doc) {
               if (err) { res.send({ msg: 'Authentication failed' }, 404); }
               
-              var token = jwt.sign(doc.toObject(), app.get('superSecret'), {
+              //Add loginStrategy to person object
+              personObj = doc.toObject();
+              personObj.loginStrategy = "facebook";
+
+              // Create a token
+              var token = jwt.sign(personObj, app.get('superSecret'), {
                 expiresIn: "24h" // expires after 24 hours
               });
               //Return token as json
               res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
                 success: true,
                 message: 'Enjoy your token!',
-                token: token,
-                loginStrategy: "facebook"
+                token: token
               });
             });
 
         } else if (person.accounts.facebook && person.accounts.facebook.id === req.body.fb.authResponse.userID) { // Person found with the email addres linked to a FB account and FB account already linked to person
           console.info("Facebookaccount gevonden bij persoon: " + person.email);
-          var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+          //Add loginStrategy to person object
+          personObj = person.toObject();
+          personObj.loginStrategy = "facebook";
+
+          // Create a token
+          var token = jwt.sign(personObj, app.get('superSecret'), {
             expiresIn: "24h" // expires after 24 hours
           });
           //Return token as json
           res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
             success: true,
             message: 'Enjoy your token!',
-            token: token,
-            loginStrategy: "facebook"
+            token: token
           });
         }
       });
@@ -334,16 +349,19 @@ app.get('/api', function (req, res) {
           console.log(person.email + " is registered.");
           person.save(function(err){
             if (err) {return next(err)}
+            //Add loginStrategy to person object
+            personObj = person.toObject();
+            personObj.loginStrategy = "local";
+
             // Create a token
-            var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+            var token = jwt.sign(personObj, app.get('superSecret'), {
               expiresIn: "24h" // expires after 24 hours
             });
             //Return token as json
             res.status(201).json({
               success: true,
               message: 'Enjoy your token!',
-              token: token,
-              loginStrategy: "local"
+              token: token
             })
           })
         }
