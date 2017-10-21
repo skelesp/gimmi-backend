@@ -297,19 +297,24 @@ app.get('/api', function (req, res) {
 
         } else if (person.accounts.facebook && person.accounts.facebook.id === req.body.fb.authResponse.userID) { // Person found with the email addres linked to a FB account and FB account already linked to person
           console.info("Facebookaccount gevonden bij persoon: " + person.email);
-          //Add loginStrategy to person object
-          personObj = person.toObject();
-          personObj.loginStrategy = "facebook";
+          
+          Person.findOneAndUpdate({ "accounts.facebook.id": req.body.fb.authResponse.userID }, { $set: { "accounts.facebook.token": req.body.fb.authResponse.accessToken } }, { new: true }, function (err, personWithNewToken) {
+            if (err) { return next(err) }
+            console.info("Facebook token updated for : " + person.email);
+            //Add loginStrategy to person object
+            personObj = personWithNewToken.toObject();
+            personObj.loginStrategy = "facebook";
 
-          // Create a token
-          var token = jwt.sign(personObj, app.get('superSecret'), {
-            expiresIn: "24h" // expires after 24 hours
-          });
-          //Return token as json
-          res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
-            success: true,
-            message: 'Enjoy your token!',
-            token: token
+            // Create a token
+            var token = jwt.sign(personObj, app.get('superSecret'), {
+              expiresIn: "24h" // expires after 24 hours
+            });
+            //Return token as json
+            res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
+              success: true,
+              message: 'Enjoy your token!',
+              token: token
+            });
           });
         }
       });
