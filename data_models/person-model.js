@@ -29,7 +29,8 @@ var personSchema = new db.Schema({
 },
 {
     toObject: { virtuals: true },
-    toJSON: { virtuals: true }
+    toJSON: { virtuals: true },
+    timestamps: true
 });
 
 personSchema.virtual('fullName').get(function(){
