@@ -99,7 +99,7 @@ app.get('/api', function (req, res) {
       },
       {
         $project: {
-          "wishes.createdBy": { "email": 0, "password": 0 }
+          "wishes.createdBy": { "email": 0, "accounts": 0 }
         }
       }
     ]).exec( function(err, wishlist){
@@ -193,35 +193,168 @@ app.get('/api', function (req, res) {
 
   //Authenticate a person
   app.post('/api/authenticate', function(req,res,next){
-    Person.findOne({ email : req.body.email.toLowerCase() }, function (err, person){
-      if (err) return next(err);
+    if (req.body.account === "local"){
+      Person.findOne({ email: req.body.email.toLowerCase() }, function (err, person) {
+        if (err) return next(err);
 
-      if (!person) {
-        res.status(401).json({success: false, message: "Authentication failed."})
-      } else {
-        //Check password
-        person.comparePassword(req.body.password, function(err, isMatch){
-          if (err) next(err);
+        if (!person) {
+          res.status(401).json({ success: false, message: "Authentication failed." })
+        } else {
+          //Check password
+          person.comparePassword(req.body.password, function (err, isMatch) {
+            if (err) next(err);
 
-          if (!isMatch) {
-            res.status(401).json({ success: false, message: 'Authentication failed!'})
-          } else { // Person found and correct password
+            if (!isMatch) {
+              res.status(401).json({ success: false, message: 'Authentication failed!' })
+            } else { // Person found and correct password
+
+              //Add loginStrategy to person object
+              personObj = person.toObject();
+              personObj.loginStrategy = "local";
+
+              // Create a token
+              var token = jwt.sign(personObj, app.get('superSecret'), {
+                expiresIn: "24h" // expires after 24 hours
+              })
+
+              //Return token as json
+              res.status(200).json({
+                success: true,
+                message: 'Enjoy your token!',
+                token: token
+              })
+            }
+          });
+        }
+      });
+    } else if (req.body.account === "facebook") {
+
+      Person.findOneAndUpdate(
+        { "accounts.facebook.id": req.body.fb.authResponse.userID }, 
+        { $set: { "accounts.facebook.token": req.body.fb.authResponse.accessToken, "accounts.facebook.profile_pic": req.body.userInfo.picture.data.url } }, 
+        { new: true }, 
+        function (err, personWithFBaccount) {
+          if (err) { return next(err) }
+          
+          if (personWithFBaccount) { // Person found with Facebook-account used for login
+            console.info("Facebook account (token/pic) updated for : " + personWithFBaccount.email);
+            //Add loginStrategy to person object
+            personObj = personWithFBaccount.toObject();
+            personObj.loginStrategy = "facebook";
 
             // Create a token
-            var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+            var token = jwt.sign(personObj, app.get('superSecret'), {
               expiresIn: "24h" // expires after 24 hours
-            })
-
+            });
             //Return token as json
-            res.status(200).json({
+            res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
               success: true,
               message: 'Enjoy your token!',
               token: token
-            })
+            });
+          } else { // No person found with Facebook account used for login (= new user or add FB account to existing user)
+            console.info("No user found with this FB account");
+            Person.findOne({ email: req.body.userInfo.email.toLowerCase() }, function (err, person) {
+              if (err) return next(err);
+
+              if (!person) {//There's no person with the email address of the facebook account ==> add new Person
+                console.info("No user found with FB account and with email linked to FB account");
+                var person = new Person({
+                  firstName: req.body.userInfo.first_name,
+                  lastName: req.body.userInfo.last_name,
+                  email: req.body.userInfo.email.toLowerCase(),
+                  /* birthday: req.body.birthday, */
+                  accounts: {
+                    facebook: {
+                      id: req.body.fb.authResponse.userID,
+                      token: req.body.fb.authResponse.accessToken,
+                      profile_pic: req.body.userInfo.picture.data.url
+                    }
+                  }
+                });
+                person.save(function (err) {
+                  if (err) { return next(err) }
+                  console.info("New person added: " + person.email);
+
+                  //Add loginStrategy to person object
+                  personObj = person.toObject();
+                  personObj.loginStrategy = "facebook";
+
+                  // Create a token
+                  var token = jwt.sign(personObj, app.get('superSecret'), {
+                    expiresIn: "24h" // expires after 24 hours
+                  });
+                  //Return token as json
+                  res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
+                    success: true,
+                    message: 'Enjoy your token!',
+                    token: token
+                  });
+                })
+              } else if (!person.accounts.facebook) { // A person with the email linked to the facebook account exists, but the FB account wasn't registered yet ==> add FB account 
+                console.info("Facebookaccount added to existing person with FB account email: " + person.email);
+                Person.findOneAndUpdate({ email: person.email },
+                  {
+                    $set: {
+                      "accounts.facebook": {
+                        id: req.body.fb.authResponse.userID,
+                        token: req.body.fb.authResponse.accessToken,
+                        profile_pic: req.body.userInfo.picture.data.url
+                      }
+                    }
+                  },
+                  { new: true /* return the new document instead of the old */ })
+                  .exec(function (err, doc) {
+                    if (err) { res.send({ msg: 'Authentication failed' }, 404); }
+
+                    //Add loginStrategy to person object
+                    personObj = doc.toObject();
+                    personObj.loginStrategy = "facebook";
+
+                    // Create a token
+                    var token = jwt.sign(personObj, app.get('superSecret'), {
+                      expiresIn: "24h" // expires after 24 hours
+                    });
+                    //Return token as json
+                    res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
+                      success: true,
+                      message: 'Enjoy your token!',
+                      token: token
+                    });
+                  });
+              } else if (person.accounts.facebook.id !== req.body.fb.authResponse.userID) { // A person with same email exists, but different FB account ID saved ==> update FB account ID
+                Person.findOneAndUpdate(
+                  { email: req.body.userInfo.email.toLowerCase() }, 
+                  { $set: { "accounts.facebook.token": req.body.fb.authResponse.accessToken, "accounts.facebook.id": req.body.fb.authResponse.userID }, "accounts.facebook.profile_pic": req.body.userInfo.picture.data.url }, 
+                  { new: true }, 
+                  function (err, personWithNewFBid) {
+                    if (err) return next(err);
+                    
+                    if (personWithNewFBid) {
+                      console.info("Facebook ID updated for user: " + personWithNewFBid.email);
+
+                      personObj = personWithNewFBid.toObject();
+                      personObj.loginStrategy = "facebook";
+
+                      // Create a token
+                      var token = jwt.sign(personObj, app.get('superSecret'), {
+                        expiresIn: "24h" // expires after 24 hours
+                      });
+                      //Return token as json
+                      res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
+                        success: true,
+                        message: 'Enjoy your token!',
+                        token: token
+                      });
+                    }                  
+                  }
+                );
+              }
+            });
           }
-        });
-      }
-    });
+        }
+      );
+    }
   });
 
   // Register a Person
@@ -249,13 +382,20 @@ app.get('/api', function (req, res) {
             lastName : req.body.lastname,
             email : req.body.email.toLowerCase(),
             birthday : req.body.birthday,
-            password : req.body.password
-          })
+            accounts: {
+              local: { password: req.body.password }
+            }
+          });
+          
           console.log(person.email + " is registered.");
           person.save(function(err){
             if (err) {return next(err)}
+            //Add loginStrategy to person object
+            personObj = person.toObject();
+            personObj.loginStrategy = "local";
+
             // Create a token
-            var token = jwt.sign(person.toObject(), app.get('superSecret'), {
+            var token = jwt.sign(personObj, app.get('superSecret'), {
               expiresIn: "24h" // expires after 24 hours
             });
             //Return token as json
@@ -279,8 +419,8 @@ app.get('/api', function (req, res) {
       // Verify secret and "expiresIn"
       jwt.verify(token, app.get('superSecret'), function(err, decoded) {
         if (err) {
-          console.log("Failed to verify token:", token);
-          return res.status(401).json({success: false, message:"Failed to authenticate token. Token could be expired or wrong."})
+          console.log("Failed to verify token:" + token);
+          return res.status(401).json({success: false, message:"Failed to validate token. Token could be expired or wrong."})
         } else {
           // Everything ok: save the decoded data for other routes
           req.decoded = decoded
@@ -315,7 +455,7 @@ app.get('/api', function (req, res) {
         console.log(err);
         return next(err);
       }
-      Wish.populate(wish, {path: "createdBy", select:{ 'password': 0, 'email': 0 } }, function (err, wish){
+      Wish.populate(wish, {path: "createdBy", select:{ 'accounts': 0, 'email': 0 } }, function (err, wish){
         res.status(201).json(wish)
       });
     })
