@@ -112,7 +112,7 @@ smtpTransporter.verify(function (error, success) {
 });
 
 // Mail route POST
-app.post('/api/email', (req, res) => {
+app.post('/api/email', (req, res, next) => {
   var mailOptions = {
     from: '"Gimmi" <no-reply@gimmi.be>',
     to: req.body.to,
@@ -123,7 +123,13 @@ app.post('/api/email', (req, res) => {
 
   smtpTransporter.sendMail(mailOptions, (error, info) => {
     if (error) {
-      return console.log(error);
+      console.error(error);
+      var data = {
+        error: error,
+        message: 'Mail not sent.'
+      }
+      res.status(500).json(data);
+      return next();
     }
     console.log('Message sent: %s (%s)', info.messageId, info.response);
     res.status(250).json(info.messageId);
