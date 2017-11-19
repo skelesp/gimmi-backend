@@ -9,6 +9,7 @@ var mongoose = require('mongoose');
 var util = require('util');
 var _ = require('lodash');
 var nodemailer = require('nodemailer');
+var htmlToText = require('nodemailer-html-to-text').htmlToText;
 
 // load needed mongoose data models
 var Wish = require('./data_models/wish-model')
@@ -111,14 +112,16 @@ smtpTransporter.verify(function (error, success) {
   }
 });
 
+//smtp middleware
+smtpTransporter.use('compile', htmlToText()); //The plugin checks if there is no text option specified and populates it based on the html value. (https://www.npmjs.com/package/html-to-text)
+
 // Mail route POST
 app.post('/api/email', (req, res, next) => {
   var mailOptions = {
     from: '"Gimmi" <no-reply@gimmi.be>',
     to: req.body.to,
     subject: req.body.subject,
-    text: req.body.text,
-    html: req.body.html
+    html: req.body.html //geen text-value meer ==> html wordt naar text omgezet
   };
 
   smtpTransporter.sendMail(mailOptions, (error, info) => {
