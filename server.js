@@ -233,7 +233,7 @@ app.get('/api', function (req, res) {
   app.put('/api/wish/:id', function(req, res, next){
     var wish = convertNovalueToUndefined(req.body);
     Wish.findOneAndUpdate({_id: req.params.id}, wish, {new: true})
-        .populate('createdBy', 'firstName lastName')
+        .populate('createdBy reservation.reservedBy', 'firstName lastName')
         .exec( function(err, doc){
           if (err) {res.send({msg: 'Wish not found'}, 404)}
           res.status(201).json(doc);
