@@ -532,11 +532,14 @@ app.get('/api', function (req, res) {
 
   //Update person details
   app.put('/api/people/:id', function(req, res, next){
+    //Todo: controleren of de persoon gerechtigd is om de persoonsgegevens te updaten
+    //Todo: controleren of de velden gegevens bevatten in het juiste type
     Person.findOneAndUpdate(
       { "_id": req.body._id }, //find person with the corresponding ID
       { $set: { "firstName": req.body.firstName, "lastName": req.body.lastName, "birthday": req.body.birthday } },
       { new: true },
       function (err, updatedPerson) {
+        if (err) { return next(err);}
         res.status(200).json(updatedPerson);
       });
   });
