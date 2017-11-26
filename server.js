@@ -502,7 +502,7 @@ app.get('/api', function (req, res) {
         }
       }
     })
-  })
+  });
 
   app.use(function(req, res, next){
     // Check if header or url or post data contains a token
@@ -528,7 +528,18 @@ app.get('/api', function (req, res) {
         message : "No token provided"
       })
     }
-  })
+  });
+
+  //Update person details
+  app.put('/api/people/:id', function(req, res, next){
+    Person.findOneAndUpdate(
+      { "_id": req.body._id }, //find person with the corresponding ID
+      { $set: { "firstName": req.body.firstName, "lastName": req.body.lastName, "birthday": req.body.birthday } },
+      { new: true },
+      function (err, updatedPerson) {
+        res.status(200).json(updatedPerson);
+      });
+  });
 
   // Create a wish
   app.post('/api/wish', function(req, res, next){
@@ -553,7 +564,7 @@ app.get('/api', function (req, res) {
         res.status(201).json(wish)
       });
     })
-  })
+  });
 
   // Get a person by ID
   app.get('/api/people/:id', function(req,res,next){
