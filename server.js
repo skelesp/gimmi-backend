@@ -544,6 +544,25 @@ app.get('/api', function (req, res) {
       });
   });
 
+  app.put('/api/people/:id/password', function(req, res, next) {
+    if(req.body.pw){
+      console.log("Nieuw wachtwoord: " + req.body.pw);
+
+      Person.findById(req.params.id, function (err, person) {  //find person with the corresponding ID
+        if (err) return next(err);
+        person.accounts.local.password = req.body.pw;
+        person.markModified('accounts.local.password')
+        person.save(function(err, person, numAffected){
+          if (err) return next(err);
+          res.status(200).json(person);
+        });
+      });
+          
+    } else {
+      return next("No password provided");
+    }
+  });
+
   // Create a wish
   app.post('/api/wish', function(req, res, next){
    var wish = new Wish ({
