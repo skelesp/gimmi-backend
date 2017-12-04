@@ -502,7 +502,7 @@ app.get('/api', function (req, res) {
         }
       }
     })
-  })
+  });
 
   app.use(function(req, res, next){
     // Check if header or url or post data contains a token
@@ -528,7 +528,40 @@ app.get('/api', function (req, res) {
         message : "No token provided"
       })
     }
-  })
+  });
+
+  //Update person details
+  app.put('/api/people/:id', function(req, res, next){
+    //Todo: controleren of de persoon gerechtigd is om de persoonsgegevens te updaten
+    //Todo: controleren of de velden gegevens bevatten in het juiste type
+    Person.findOneAndUpdate(
+      { "_id": req.body._id }, //find person with the corresponding ID
+      { $set: { "firstName": req.body.firstName, "lastName": req.body.lastName, "birthday": req.body.birthday } },
+      { new: true },
+      function (err, updatedPerson) {
+        if (err) { return next(err);}
+        res.status(200).json(updatedPerson);
+      });
+  });
+
+  app.put('/api/people/:id/password', function(req, res, next) {
+    if(req.body.pw){
+      console.log("Nieuw wachtwoord: " + req.body.pw);
+
+      Person.findById(req.params.id, function (err, person) {  //find person with the corresponding ID
+        if (err) return next(err);
+        person.accounts.local.password = req.body.pw;
+        person.markModified('accounts.local.password')
+        person.save(function(err, person, numAffected){
+          if (err) return next(err);
+          res.status(200).json(person);
+        });
+      });
+          
+    } else {
+      return next("No password provided");
+    }
+  });
 
   // Create a wish
   app.post('/api/wish', function(req, res, next){
@@ -553,7 +586,7 @@ app.get('/api', function (req, res) {
         res.status(201).json(wish)
       });
     })
-  })
+  });
 
   // Get a person by ID
   app.get('/api/people/:id', function(req,res,next){
