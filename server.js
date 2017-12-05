@@ -550,8 +550,12 @@ app.get('/api', function (req, res) {
 
       Person.findById(req.params.id, function (err, person) {  //find person with the corresponding ID
         if (err) return next(err);
-        person.accounts.local.password = req.body.pw;
-        person.markModified('accounts.local.password')
+        if (!person.accounts.local) { // if person doesn't have a local account: add a local account with password
+          person.accounts.local = { "password": req.body.pw};
+        } else { // if person has local account: update password
+          person.accounts.local.password = req.body.pw;
+        }
+        person.markModified('accounts.local.password');
         person.save(function(err, person, numAffected){
           if (err) return next(err);
           res.status(200).json(person);
