@@ -567,6 +567,29 @@ app.get('/api', function (req, res) {
     }
   });
 
+  // Facebook account
+  app.delete('/api/people/:id/account/facebook', function(req, res, next){
+    Person.findByIdAndUpdate(req.params.id, { $unset: { "accounts.facebook": "" } }, { new: true } , function(err, person){
+      if (err) return next(err);
+      
+      var token = null;
+      var personObj = person.toObject(); // Convert het MongoDB object naar een gewoon Javascript object
+      
+      if (personObj.accounts.local) {
+        personObj.loginStrategy = "local"; //Add loginStrategy to person object
+        token = createJWTtoken(personObj); // Creëer een nieuwe token
+      }
+      
+      res.status(200).json(token); // Stuur de nieuwe token als response van de call
+    });
+  });
+
+  function createJWTtoken (person){
+    // Create a token
+    return jwt.sign(person, app.get('superSecret'), {
+      expiresIn: "24h" // expires after 24 hours
+    });
+  }
   // Create a wish
   app.post('/api/wish', function(req, res, next){
    var wish = new Wish ({
