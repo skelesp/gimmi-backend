@@ -544,7 +544,9 @@ app.get('/api', function (req, res) {
       });
   });
 
-  app.put('/api/people/:id/password', function(req, res, next) {
+  // Accounts API
+  // Local Gimmi account
+  app.put('/api/people/:id/account/local', function(req, res, next) {
     if(req.body.pw){
       Person.findById(req.params.id, function (err, person) {  //find person with the corresponding ID
         if (err) return next(err);
