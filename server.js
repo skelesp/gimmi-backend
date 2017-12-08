@@ -160,137 +160,6 @@ app.get('/api', function (req, res) {
   res.send('Welcome to the GIMMI API!');
 });
 
-// --- Wish API routes ---
-  // Retrieve a wishlist
-  app.get('/api/wishlist/:receiverId', function(req, res, next){
-    Wish.aggregate([
-      { $match: { receiver: new mongoose.Types.ObjectId(req.params.receiverId) } },
-      {
-        $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
-          from: "people",
-          localField: "createdBy",
-          foreignField: "_id",
-          as: "creator"
-        }
-      },
-      {
-        $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
-          from: "people",
-          localField: "receiver",
-          foreignField: "_id",
-          as: "receiver"
-        }
-      },
-      { $unwind: "$creator" },
-      { $unwind: "$receiver" },
-      {
-        $group: {
-          _id: { receiver: "$receiver" },
-          wishes: {
-            $push: {
-              _id: "$_id",
-              title: "$title",
-              image: "$image",
-              price: "$price",
-              createdAt: "$createdAt",
-              createdBy: "$creator",
-              reservation: "$reservation"
-            }
-          },
-          count: { $sum: 1 }
-        }
-      },
-      {
-        $project: {
-          "wishes.createdBy": { "email": 0, "accounts": 0 },
-          "_id.receiver": { "email": 0, "accounts": 0 },
-        }
-      }
-    ]).exec( function(err, wishlist){
-      if (err) {return next(err)}
-      if (!Array.isArray(wishlist) || !wishlist.length) {
-        Person.findById(req.params.receiverId, {accounts: 0, email: 0, createdAt: 0, updatedAt: 0}, function(err, person){
-          wishlist = [{
-            _id: { receiver: person },
-            count: 0,
-            wishes: []
-          }];
-          console.log(wishlist);
-          res.json(wishlist);
-        });
-      } else {
-        console.log(wishlist);
-        res.json(wishlist);
-      }
-    })
-  })
-
-  // Get a wish
-  app.get('/api/wish/:id', function(req, res, next){
-    Wish.find({_id: req.params.id})
-        .populate('createdBy reservation.reservedBy', 'firstName lastName')
-        .exec( function(err, result){
-      if (err) return next (err);
-      res.status(200).json(result);
-    });
-  });
-
-  function convertNovalueToUndefined (object) {
-		return _.mapValues(object, function(value){
-			if (value === "#*/NO_VALUE/*#") {
-				return value = undefined;
-			} else {
-				return value;
-			}
-		});
-  }
-
-  // Update a wish
-  app.put('/api/wish/:id', function(req, res, next){
-    var wish = convertNovalueToUndefined(req.body);
-    Wish.findOneAndUpdate({_id: req.params.id}, wish, {new: true})
-        .populate('createdBy reservation.reservedBy', 'firstName lastName')
-        .exec( function(err, doc){
-          if (err) {res.send({msg: 'Wish not found'}, 404)}
-          res.status(201).json(doc);
-        });
-  })
-// Reservation API - POST
-  app.post('/api/wish/:id/reservation', function(req, res, next){
-    Wish.findOneAndUpdate({_id: req.params.id},
-          {reservation: {reservedBy: req.body.reservedBy,
-                        amount: req.body.amount,
-                        reservationDate: req.body.reservationDate,
-                        reason: req.body.reason}
-          },
-        {new: true})
-    .populate('createdBy', 'firstName lastName')
-    .populate('reservation.reservedBy', 'firstName lastName')
-    .exec( function(err, doc){
-      if (err) {res.send({msg: 'Reservation failed'}, 404);}
-      res.status(201).json(doc);
-    });
-  });
-// Reservation API - DELETE
-  app.delete('/api/wish/:id/reservation', function(req, res, next){
-    Wish.findOneAndUpdate({_id : req.params.id}, {$unset: { reservation: "" }}, {new: true})
-    .populate('createdBy', 'firstName lastName')
-    .exec(function(err, doc) {
-      if (err) {res.send({msg: 'Reservation delete failed'}, 404);}
-      res.status(201).json(doc);
-    });
-  });
-// Reservation API - GET
-// Reservation API - PUT
-
-  // Delete a wish
-  app.delete('/api/wish/:id', function(req,res,next){
-    Wish.findByIdAndRemove(req.params.id, function(err, post){
-      if (err) return next(err)
-      res.status(201).json(post)
-    })
-  })
-
   // --- Person API routes ---
 
   // Get all the people registered in Gimmi
@@ -545,6 +414,138 @@ app.get('/api', function (req, res) {
       })
     }
   });
+
+// --- Wish API routes ---
+// Retrieve a wishlist
+app.get('/api/wishlist/:receiverId', function (req, res, next) {
+  Wish.aggregate([
+    { $match: { receiver: new mongoose.Types.ObjectId(req.params.receiverId) } },
+    {
+      $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
+        from: "people",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "creator"
+      }
+    },
+    {
+      $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
+        from: "people",
+        localField: "receiver",
+        foreignField: "_id",
+        as: "receiver"
+      }
+    },
+    { $unwind: "$creator" },
+    { $unwind: "$receiver" },
+    {
+      $group: {
+        _id: { receiver: "$receiver" },
+        wishes: {
+          $push: {
+            _id: "$_id",
+            title: "$title",
+            image: "$image",
+            price: "$price",
+            createdAt: "$createdAt",
+            createdBy: "$creator",
+            reservation: "$reservation"
+          }
+        },
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $project: {
+        "wishes.createdBy": { "email": 0, "accounts": 0 },
+        "_id.receiver": { "email": 0, "accounts": 0 },
+      }
+    }
+  ]).exec(function (err, wishlist) {
+    if (err) { return next(err) }
+    if (!Array.isArray(wishlist) || !wishlist.length) {
+      Person.findById(req.params.receiverId, { accounts: 0, email: 0, createdAt: 0, updatedAt: 0 }, function (err, person) {
+        wishlist = [{
+          _id: { receiver: person },
+          count: 0,
+          wishes: []
+        }];
+        res.json(wishlist);
+      });
+    } else {
+      res.json(wishlist);
+    }
+  })
+})
+
+// Get a wish
+app.get('/api/wish/:id', function (req, res, next) {
+  Wish.find({ _id: req.params.id })
+    .populate('createdBy reservation.reservedBy', 'firstName lastName')
+    .exec(function (err, result) {
+      if (err) return next(err);
+      res.status(200).json(result);
+    });
+});
+
+function convertNovalueToUndefined(object) {
+  return _.mapValues(object, function (value) {
+    if (value === "#*/NO_VALUE/*#") {
+      return value = undefined;
+    } else {
+      return value;
+    }
+  });
+}
+
+// Update a wish
+app.put('/api/wish/:id', function (req, res, next) {
+  var wish = convertNovalueToUndefined(req.body);
+  Wish.findOneAndUpdate({ _id: req.params.id }, wish, { new: true })
+    .populate('createdBy reservation.reservedBy', 'firstName lastName')
+    .exec(function (err, doc) {
+      if (err) { res.send({ msg: 'Wish not found' }, 404) }
+      res.status(201).json(doc);
+    });
+})
+// Reservation API - POST
+app.post('/api/wish/:id/reservation', function (req, res, next) {
+  Wish.findOneAndUpdate({ _id: req.params.id },
+    {
+      reservation: {
+        reservedBy: req.body.reservedBy,
+        amount: req.body.amount,
+        reservationDate: req.body.reservationDate,
+        reason: req.body.reason
+      }
+    },
+    { new: true })
+    .populate('createdBy', 'firstName lastName')
+    .populate('reservation.reservedBy', 'firstName lastName')
+    .exec(function (err, doc) {
+      if (err) { res.send({ msg: 'Reservation failed' }, 404); }
+      res.status(201).json(doc);
+    });
+});
+// Reservation API - DELETE
+app.delete('/api/wish/:id/reservation', function (req, res, next) {
+  Wish.findOneAndUpdate({ _id: req.params.id }, { $unset: { reservation: "" } }, { new: true })
+    .populate('createdBy', 'firstName lastName')
+    .exec(function (err, doc) {
+      if (err) { res.send({ msg: 'Reservation delete failed' }, 404); }
+      res.status(201).json(doc);
+    });
+});
+// Reservation API - GET
+// Reservation API - PUT
+
+// Delete a wish
+app.delete('/api/wish/:id', function (req, res, next) {
+  Wish.findByIdAndRemove(req.params.id, function (err, post) {
+    if (err) return next(err)
+    res.status(201).json(post)
+  })
+})
 
   //Update person details
   app.put('/api/people/:id', function(req, res, next){
