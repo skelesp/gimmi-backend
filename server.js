@@ -547,10 +547,34 @@ app.delete('/api/wish/:id', function (req, res, next) {
   })
 })
 
-  //Update person details
-  app.put('/api/people/:id', function(req, res, next){
-    //Todo: controleren of de persoon gerechtigd is om de persoonsgegevens te updaten
-    //Todo: controleren of de velden gegevens bevatten in het juiste type
+// Get a person by ID
+app.get('/api/people/:id', function (req, res, next) {
+  if (req.params.id === req.decoded._id) { // Check if the requesting user is the same as the requested person
+    Person.findOne({ _id: req.params.id }, function (err, person) {
+      if (err) {
+        return res.status(500).json({
+          error: "The query could not be fulfilled on the server."
+        })
+      }
+      if (person) { // person found
+        res.status(200).json(person);
+      } else {
+        res.status(404).json({
+          error: "Person not found."
+        });
+      }
+    });
+  } else { // User is not authorised to view this user
+    res.status(403).json({
+      error: "403 - User tries to view/edit another user. This is forbidden."
+    });
+  }
+});
+
+//Update person details
+app.put('/api/people/:id', function(req, res, next){
+  //Todo: controleren of de velden gegevens bevatten in het juiste type
+  if (req.params.id === req.decoded._id) { // Check if the requesting user is the same as the requested person
     Person.findOneAndUpdate(
       { "_id": req.body._id }, //find person with the corresponding ID
       { $set: { "firstName": req.body.firstName, "lastName": req.body.lastName, "birthday": req.body.birthday } },
@@ -559,7 +583,12 @@ app.delete('/api/wish/:id', function (req, res, next) {
         if (err) { return next(err);}
         res.status(200).json(updatedPerson);
       });
-  });
+  } else {
+    res.status(403).json({
+      error: "403 - User tries to view/edit another user. This is forbidden."
+    });
+  }
+});
 
   // Accounts API
   // Local Gimmi account
@@ -630,30 +659,6 @@ app.delete('/api/wish/:id', function (req, res, next) {
         res.status(201).json(wish)
       });
     })
-  });
-
-  // Get a person by ID
-  app.get('/api/people/:id', function(req,res,next){
-    if (req.params.id === req.decoded._id) { // Check if the requesting user is the same as the requested person
-      Person.findOne({ _id: req.params.id }, function (err, person) {
-        if (err) {
-          return res.status(500).json({
-            error: "The query could not be fulfilled on the server."
-          })
-        }
-        if (person) { // person found
-          res.status(200).json(person); 
-        } else {
-          res.status(404).json({
-            error: "Person not found."
-          });
-        }
-      });
-    } else { // User is not authorised to view this user
-      res.status(403).json({
-        error: "403 - User tries to view/edit another user. This is forbidden."
-      });
-    }
   });
 
   //TODO: route to verify a token
