@@ -533,8 +533,8 @@ app.get('/api', function (req, res) {
           return res.status(401).json({success: false, message:"Failed to validate token. Token could be expired or wrong."})
         } else {
           // Everything ok: save the decoded data for other routes
-          req.decoded = decoded
-          next()
+          req.decoded = decoded;
+          next();
         }
       })
     } else { // no token available
@@ -633,14 +633,26 @@ app.get('/api', function (req, res) {
 
   // Get a person by ID
   app.get('/api/people/:id', function(req,res,next){
-    Person.findOne({_id: req.params.id}, function(err, person){
-      if (err) {
+    if (req.params.id === req.decoded._id) { // Check if the requesting user is the same as the requested person
+      Person.findOne({ _id: req.params.id }, function (err, person) {
+        if (err) {
           return res.status(500).json({
-            error:"The query could not be fulfilled on the server."
+            error: "The query could not be fulfilled on the server."
           })
-      }
-      res.status(200).json(person);
-    });
+        }
+        if (person) { // person found
+          res.status(200).json(person); 
+        } else {
+          res.status(404).json({
+            error: "Person not found."
+          });
+        }
+      });
+    } else { // User is not authorised to view this user
+      res.status(403).json({
+        error: "403 - User tries to view/edit another user. This is forbidden."
+      });
+    }
   });
 
   //TODO: route to verify a token
