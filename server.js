@@ -173,10 +173,19 @@ app.get('/api', function (req, res) {
           as: "creator"
         }
       },
-      {$unwind: "$creator"},
+      {
+        $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
+          from: "people",
+          localField: "receiver",
+          foreignField: "_id",
+          as: "receiver"
+        }
+      },
+      { $unwind: "$creator" },
+      { $unwind: "$receiver" },
       {
         $group: {
-          _id: { receiverID: "$receiver" },
+          _id: { receiver: "$receiver" },
           wishes: {
             $push: {
               _id: "$_id",
@@ -193,19 +202,26 @@ app.get('/api', function (req, res) {
       },
       {
         $project: {
-          "wishes.createdBy": { "email": 0, "accounts": 0 }
+          "wishes.createdBy": { "email": 0, "accounts": 0 },
+          "_id.receiver": { "email": 0, "accounts": 0 },
         }
       }
     ]).exec( function(err, wishlist){
       if (err) {return next(err)}
       if (!Array.isArray(wishlist) || !wishlist.length) {
+        Person.findById(req.params.receiverId, {accounts: 0, email: 0, createdAt: 0, updatedAt: 0}, function(err, person){
           wishlist = [{
-            _id: {receiverID: req.params.receiverId},
+            _id: { receiver: person },
             count: 0,
             wishes: []
           }];
+          console.log(wishlist);
+          res.json(wishlist);
+        });
+      } else {
+        console.log(wishlist);
+        res.json(wishlist);
       }
-      res.json(wishlist)
     })
   })
 
