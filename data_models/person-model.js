@@ -41,7 +41,7 @@ personSchema.pre('save', function(next) {
   var person = this;
 
   // only hash the password if it has been modified (or is new)
-  if ((!person.isModified('password') && person.passMigration == false) || (typeof person.accounts.local === 'undefined')) return next();
+  if ((!person.isModified('accounts.local.password') && person.passMigration == false) || (typeof person.accounts.local === 'undefined')) return next();
 
   // generate a salt
   bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {

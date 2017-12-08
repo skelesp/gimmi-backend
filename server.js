@@ -544,14 +544,18 @@ app.get('/api', function (req, res) {
       });
   });
 
-  app.put('/api/people/:id/password', function(req, res, next) {
+  // Accounts API
+  // Local Gimmi account
+  app.put('/api/people/:id/account/local', function(req, res, next) {
     if(req.body.pw){
-      console.log("Nieuw wachtwoord: " + req.body.pw);
-
       Person.findById(req.params.id, function (err, person) {  //find person with the corresponding ID
         if (err) return next(err);
-        person.accounts.local.password = req.body.pw;
-        person.markModified('accounts.local.password')
+        if (!person.accounts.local) { // if person doesn't have a local account: add a local account with password
+          person.accounts.local = { "password": req.body.pw};
+        } else { // if person has local account: update password
+          person.accounts.local.password = req.body.pw;
+        }
+        person.markModified('accounts.local.password');
         person.save(function(err, person, numAffected){
           if (err) return next(err);
           res.status(200).json(person);
@@ -563,6 +567,29 @@ app.get('/api', function (req, res) {
     }
   });
 
+  // Facebook account
+  app.delete('/api/people/:id/account/facebook', function(req, res, next){
+    Person.findByIdAndUpdate(req.params.id, { $unset: { "accounts.facebook": "" } }, { new: true } , function(err, person){
+      if (err) return next(err);
+      
+      var token = null;
+      var personObj = person.toObject(); // Convert het MongoDB object naar een gewoon Javascript object
+      
+      if (personObj.accounts.local) {
+        personObj.loginStrategy = "local"; //Add loginStrategy to person object
+        token = createJWTtoken(personObj); // Creëer een nieuwe token
+      }
+      
+      res.status(200).json(token); // Stuur de nieuwe token als response van de call
+    });
+  });
+
+  function createJWTtoken (person){
+    // Create a token
+    return jwt.sign(person, app.get('superSecret'), {
+      expiresIn: "24h" // expires after 24 hours
+    });
+  }
   // Create a wish
   app.post('/api/wish', function(req, res, next){
    var wish = new Wish ({
