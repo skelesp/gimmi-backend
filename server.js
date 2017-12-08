@@ -209,13 +209,19 @@ app.get('/api', function (req, res) {
     ]).exec( function(err, wishlist){
       if (err) {return next(err)}
       if (!Array.isArray(wishlist) || !wishlist.length) {
+        Person.findById(req.params.receiverId, {accounts: 0, email: 0, createdAt: 0, updatedAt: 0}, function(err, person){
           wishlist = [{
-            _id: {receiverID: req.params.receiverId},
+            _id: { receiver: person },
             count: 0,
             wishes: []
           }];
+          console.log(wishlist);
+          res.json(wishlist);
+        });
+      } else {
+        console.log(wishlist);
+        res.json(wishlist);
       }
-      res.json(wishlist)
     })
   })
 
