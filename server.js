@@ -447,6 +447,7 @@ app.get('/api/wishlist/:receiverId', function (req, res, next) {
             title: "$title",
             image: "$image",
             price: "$price",
+            url: "$url",
             createdAt: "$createdAt",
             createdBy: "$creator",
             reservation: "$reservation"
