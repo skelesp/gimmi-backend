@@ -98,8 +98,8 @@ var smtpTransporter = nodemailer.createTransport({
   port: 587,
   secure: false,
   auth: {
-    user: "no-reply@test.gimmi.be",
-    pass: "testGimmi1"
+    user: "info@gimmi.be",
+    pass: "gimmiInfo1"
   }
 });
 
