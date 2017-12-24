@@ -1,4 +1,5 @@
-var db = require('../db')
+var db = require('../../db');
+
 var reservationSchema = new db.Schema({
   reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false},
   amount: {type: Number, required: true},

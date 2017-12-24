@@ -1,4 +1,4 @@
-var db = require('../db'),
+var db = require('../../db'),
     bcrypt = require('bcrypt'),
     SALT_WORK_FACTOR = 10;
 
