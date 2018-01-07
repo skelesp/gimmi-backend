@@ -46,6 +46,7 @@ app.use('/api/people', require('./api/people/routes'));
 app.use('/api/authenticate', require('./api/auth/routes'));
 app.use('/api/wishlist', require('./api/wishes/wishlist/routes'));
 app.use('/api/wish', require('./api/wishes/routes'));
+app.use('/api/reporting', require('./api/reporting/routes'));
 
 // ========================
 // = Catch errors and log =
