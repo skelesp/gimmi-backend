@@ -4,7 +4,8 @@ var reservationSchema = new db.Schema({
   reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false},
   amount: {type: Number, required: true},
   reservationDate: {type: Date, required: true},
-  reason: {type: String, required: false}
+  reason: {type: String, required: false},
+  hideUntil: {type: Date, required: false}
 });
 
 var WishSchema = new db.Schema(

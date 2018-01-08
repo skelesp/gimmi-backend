@@ -65,7 +65,8 @@ exports.reserve = function (req, res, next) {
                 reservedBy: req.body.reservedBy,
                 amount: req.body.amount,
                 reservationDate: req.body.reservationDate,
-                reason: req.body.reason
+                reason: req.body.reason,
+                hideUntil: req.body.hideUntil
             }
         },
         { new: true })
