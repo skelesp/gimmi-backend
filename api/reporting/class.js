@@ -20,8 +20,14 @@ exports.getLeanstartupData = function(req, res, next) {
         }
     ], function(err, results) {
         // Results = array of results from parallel calls
-        var labels = generatePeriodLabels(new Date(2016,11,1));
-        var data = generateLeanStartupData(labels, results);        
+        var startDate = new Date(2016, 10, 1);
+        var labels = generatePeriodLabels(startDate);
+        var data = generateLeanStartupData(labels, results);
+        
+        // Last month is running month
+        labels[labels.length-1] += "**";        
+
+        // Send response
         res.status(200).json({
             data: data,
             labels: labels,
@@ -61,7 +67,7 @@ function generatePeriodLabels(startDate, numberOfPeriods){
     if (numberOfPeriods > 0) { // Running period with fixed number of periods
         startDate.setMonth(startDate.getMonth() - numberOfPeriods);
     } else { // Period from startDate to now (dynamically count periods)
-        numberOfPeriods = monthDiff(startDate, new Date());
+        numberOfPeriods = monthDiff(startDate, new Date()) + 2; // Diff between start and now + startmonth + currentMonth
     }
 
     // Initialize variables
