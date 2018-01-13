@@ -20,7 +20,8 @@ var WishSchema = new db.Schema(
     amountWanted: {type: Number, default: 1},
     receiver: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     createdBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
-    reservation: {type: reservationSchema, required: false}
+    reservation: {type: reservationSchema, required: false},
+    copyOf: { type: db.Schema.Types.ObjectId, ref:"Wish", required: false}
   },
   {
     timestamps: true

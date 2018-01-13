@@ -15,7 +15,8 @@ exports.create = function (req, res, next) {
         description: req.body.description,
         amountWanted: req.body.amountWanted,
         receiver: req.body.receiver,
-        createdBy: req.body.createdBy
+        createdBy: req.body.createdBy,
+        copyOf: req.body.copyOf
     });
     wish.save(function (err, wish) {
         if (err) {
