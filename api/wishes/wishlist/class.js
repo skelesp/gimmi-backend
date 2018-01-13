@@ -3,7 +3,8 @@ var mongoose = require('mongoose');
 
 // Get a wishlist of a person
 exports.getWishlist = function (req, res, next) {
-    Wish.aggregate([
+    Wish
+    .aggregate([
         { $match: { receiver: new mongoose.Types.ObjectId(req.params.receiverId) } },
         {
             $lookup: { //Opgelet:virtuals worden hier niet meegenomen, dus als 'fullname' van een person nodig zou zijn hier, moet dit toegevoegd worden in één van de volgende stages
@@ -35,7 +36,8 @@ exports.getWishlist = function (req, res, next) {
                         url: "$url",
                         createdAt: "$createdAt",
                         createdBy: "$creator",
-                        reservation: "$reservation"
+                        reservation: "$reservation",
+                        copyOf: "$copyOf"
                     }
                 },
                 count: { $sum: 1 }
@@ -62,4 +64,13 @@ exports.getWishlist = function (req, res, next) {
             res.json(wishlist);
         }
     })
+};
+
+exports.getListOfCopies = function (req, res, next){
+    Wish
+    .find({ receiver: new mongoose.Types.ObjectId(req.params.receiverId) , "copyOf": { $exists: true } })
+    .exec(function(err, result){
+        if (err) return next(err);
+        res.status(200).json(result);
+    });
 };

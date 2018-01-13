@@ -5,5 +5,7 @@ var Wishlist = require('./class');
 
 wishlistRouter.route('/:receiverId')
     .get(Wishlist.getWishlist);
+wishlistRouter.route('/:receiverId/copies')
+    .get(Wishlist.getListOfCopies);
     
 module.exports = wishlistRouter;
