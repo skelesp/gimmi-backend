@@ -324,6 +324,6 @@ exports.deleteFacebookAccount = function (req, res, next) {
 function createJWTtoken(person) {
     // Create a token
     return jwt.sign(person, config.jwt_secret, {
-        expiresIn: "24h" // expires after 24 hours
+        expiresIn: "720h" // expires after 30 days
     });
 }
