@@ -43,7 +43,7 @@ module.exports = function(req, res, next) {
                     return res.status(401).json({ success: false, message: "Failed to validate token. Token could be expired or wrong." })
                 } else {
                     // Everything ok: save the decoded data for other routes
-                    req.decoded = decoded;
+                    req.authenticatedUser = decoded;
                     next();
                 }
             });

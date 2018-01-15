@@ -68,8 +68,8 @@ exports.register = function (req, res, next) {
 
 // Get a person by ID
 exports.get = function (req, res, next) {
-    if (req.decoded) {
-        if (req.params.id === req.decoded._id) { // Check if the requesting user is the same as the requested person
+    if (req.authenticatedUser) {
+        if (req.params.id === req.authenticatedUser._id) { // Check if the requesting user is the same as the requested person
             Person.findOne({ _id: req.params.id }, function (err, person) {
                 if (err) {
                     return res.status(500).json({
@@ -99,7 +99,7 @@ exports.get = function (req, res, next) {
 //Update person details
 exports.update = function (req, res, next) {
     //Todo: controleren of de velden gegevens bevatten in het juiste type
-    if (req.params.id === req.decoded._id) { // Check if the requesting user is the same as the requested person
+    if (req.params.id === req.authenticatedUser._id) { // Check if the requesting user is the same as the requested person
         Person.findOneAndUpdate(
             { "_id": req.body._id }, //find person with the corresponding ID
             { $set: { "firstName": req.body.firstName, "lastName": req.body.lastName, "birthday": req.body.birthday } },
