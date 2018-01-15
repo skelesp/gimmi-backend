@@ -51,15 +51,14 @@ exports.register = function (req, res, next) {
                     personObj.loginStrategy = "local";
 
                     // Create a token
-                    var token = jwt.sign(personObj, config.jwt_secret, {
-                        expiresIn: "24h" // expires after 24 hours
-                    });
+                    var token = createJWTtoken(personObj);
+                    
                     //Return token as json
                     res.status(201).json({
                         success: true,
                         message: 'Enjoy your token!',
                         token: token
-                    })
+                    });
                 })
             }
         }
@@ -137,9 +136,7 @@ exports.authenticate = function (req, res, next) {
                         personObj.loginStrategy = "local";
 
                         // Create a token
-                        var token = jwt.sign(personObj, config.jwt_secret, {
-                            expiresIn: "24h" // expires after 24 hours
-                        })
+                        var token = createJWTtoken(personObj);
 
                         //Return token as json
                         res.status(200).json({
@@ -167,9 +164,8 @@ exports.authenticate = function (req, res, next) {
                     personObj.loginStrategy = "facebook";
 
                     // Create a token
-                    var token = jwt.sign(personObj, config.jwt_secret, {
-                        expiresIn: "24h" // expires after 24 hours
-                    });
+                    var token = createJWTtoken(personObj);
+
                     //Return token as json
                     res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
                         success: true,
@@ -205,9 +201,8 @@ exports.authenticate = function (req, res, next) {
                                 personObj.loginStrategy = "facebook";
 
                                 // Create a token
-                                var token = jwt.sign(personObj, config.jwt_secret, {
-                                    expiresIn: "24h" // expires after 24 hours
-                                });
+                                var token = createJWTtoken(personObj);
+
                                 //Return token as json
                                 res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
                                     success: true,
@@ -236,9 +231,8 @@ exports.authenticate = function (req, res, next) {
                                     personObj.loginStrategy = "facebook";
 
                                     // Create a token
-                                    var token = jwt.sign(personObj, config.jwt_secret, {
-                                        expiresIn: "24h" // expires after 24 hours
-                                    });
+                                    var token = createJWTtoken(personObj);
+
                                     //Return token as json
                                     res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
                                         success: true,
@@ -261,9 +255,8 @@ exports.authenticate = function (req, res, next) {
                                         personObj.loginStrategy = "facebook";
 
                                         // Create a token
-                                        var token = jwt.sign(personObj, config.jwt_secret, {
-                                            expiresIn: "24h" // expires after 24 hours
-                                        });
+                                        var token = createJWTtoken(personObj);
+
                                         //Return token as json
                                         res.status(201).json({ //WRONG implementation!! Registration should return a 201, but shouldn't add a token ==> after registration: call authentication to receive token!!
                                             success: true,
@@ -320,6 +313,10 @@ exports.deleteFacebookAccount = function (req, res, next) {
         res.status(200).json(token); // Stuur de nieuwe token als response van de call
     });
 };
+
+///////////////////////
+// Private functions //
+///////////////////////
 
 function createJWTtoken(person) {
     // Create a token
