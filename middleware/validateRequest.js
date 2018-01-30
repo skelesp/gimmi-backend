@@ -18,6 +18,10 @@ var unprotectedRestCalls = [
     { // Check if email exists
         route: '/api/people/email/*',
         method: 'GET'
+    },
+    { // Get username by ID
+        route: '/api/people/*/name',
+        method: 'GET'
     }
 ];
 

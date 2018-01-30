@@ -14,6 +14,8 @@ peopleRouter.route('/:id')
     .delete();
 peopleRouter.route('/email/:email')
     .get(Person.getByEmail);
+peopleRouter.route('/:id/name')
+    .get(Person.getNameByID);
 
 // Accounts API
 // Local Gimmi account
