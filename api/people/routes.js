@@ -9,9 +9,11 @@ peopleRouter.route('/')
     .post(Person.register);
 
 peopleRouter.route('/:id')
-    .get(Person.get)
+    .get(Person.getByID)
     .put(Person.update)
     .delete();
+peopleRouter.route('/email/:email')
+    .get(Person.getByEmail);
 
 // Accounts API
 // Local Gimmi account

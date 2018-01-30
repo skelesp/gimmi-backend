@@ -66,7 +66,7 @@ exports.register = function (req, res, next) {
 };
 
 // Get a person by ID
-exports.get = function (req, res, next) {
+exports.getByID = function (req, res, next) {
     if (req.authenticatedUser) {
         if (req.params.id === req.authenticatedUser._id) { // Check if the requesting user is the same as the requested person
             Person.findOne({ _id: req.params.id }, function (err, person) {
@@ -93,6 +93,25 @@ exports.get = function (req, res, next) {
             error: "401 - User is not authenticated."
         });
     }
+};
+
+// Get a person by ID
+exports.getByEmail= function (req, res, next) {
+    Person.findOne({ email: req.params.email }, 'firstName lastName email', function (err, person) {
+        if (err) {
+            return res.status(500).json({
+                error: "The query could not be fulfilled on the server."
+            })
+        }
+        
+        if (person) { // person found
+            res.status(200).json(person);
+        } else {
+            res.status(404).json({
+                error: "Person not found."
+            });
+        }
+    });
 };
 
 //Update person details
