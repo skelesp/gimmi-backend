@@ -1,4 +1,5 @@
 var Wish = require('../model');
+var Person = require('../../people/model');
 var mongoose = require('mongoose');
 
 // Get a wishlist of a person
@@ -63,7 +64,7 @@ exports.getWishlist = function (req, res, next) {
         } else {
             res.json(wishlist);
         }
-    })
+    });
 };
 
 exports.getListOfCopies = function (req, res, next){
