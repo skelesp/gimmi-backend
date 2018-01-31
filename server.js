@@ -2,18 +2,8 @@ var express = require ('express');
 var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-var jwt = require('jsonwebtoken');
 var config = require('./config');
-var request = require('request');
 var mongoose = require('mongoose');
-var util = require('util');
-var _ = require('lodash');
-var nodemailer = require('nodemailer');
-var htmlToText = require('nodemailer-html-to-text').htmlToText;
-
-// load needed mongoose data models
-var Wish = require('./data_models/wish-model')
-var Person = require('./data_models/person-model')
 
 // ========================
 // = Server configuration =
@@ -21,7 +11,6 @@ var Person = require('./data_models/person-model')
 
 // Set variables
 var port = process.env.PORT || config.api_port  //Port to access the API
-app.set('superSecret', config.jwt_secret)       //Secret variable to sign tokens
 
 // Use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -47,6 +36,7 @@ app.all("/api/*", function (req, res, next) {
 // = Server routes =
 // =================
 
+<<<<<<< HEAD
 // --- Mail API ---
 
 // Setup mailobject
@@ -663,6 +653,19 @@ app.put('/api/people/:id', function(req, res, next){
   });
 
   //TODO: route to verify a token
+=======
+// Validate (un)protected routes 
+app.all('/*', require('./middleware/validateRequest'));
+
+app.use('/dev', require('./api/dev/dev-api'));
+app.use('/api/email', require('./api/communication/mail/mail-api'));
+app.use('/api/gcse', require('./api/gcse/gcse-api'));
+app.use('/api/people', require('./api/people/routes'));
+app.use('/api/authenticate', require('./api/auth/routes'));
+app.use('/api/wishlist', require('./api/wishes/wishlist/routes'));
+app.use('/api/wish', require('./api/wishes/routes'));
+app.use('/api/reporting', require('./api/reporting/routes'));
+>>>>>>> release-1.1.0
 
 // ========================
 // = Catch errors and log =

@@ -1,9 +1,11 @@
-var db = require('../db')
+var db = require('../../db');
+
 var reservationSchema = new db.Schema({
   reservedBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: false},
   amount: {type: Number, required: true},
   reservationDate: {type: Date, required: true},
-  reason: {type: String, required: false}
+  reason: {type: String, required: false},
+  hideUntil: {type: Date, required: false}
 });
 
 var WishSchema = new db.Schema(
@@ -18,7 +20,8 @@ var WishSchema = new db.Schema(
     amountWanted: {type: Number, default: 1},
     receiver: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     createdBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
-    reservation: {type: reservationSchema, required: false}
+    reservation: {type: reservationSchema, required: false},
+    copyOf: { type: db.Schema.Types.ObjectId, ref:"Wish", required: false}
   },
   {
     timestamps: true
