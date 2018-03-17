@@ -1,5 +1,4 @@
-// --- Mail API ---
-var router = require('express').Router();
+// --- Mail class ---
 var nodemailer = require('nodemailer');
 var htmlToText = require('nodemailer-html-to-text').htmlToText;
 
@@ -26,8 +25,8 @@ smtpTransporter.verify(function (error, success) {
 //smtp middleware
 smtpTransporter.use('compile', htmlToText()); //The plugin checks if there is no text option specified and populates it based on the html value. (https://www.npmjs.com/package/html-to-text)
 
-// Send an email
-router.post('/', (req, res, next) => {
+// Send an email via API
+exports.sendViaAPI = function (req, res, next) {
     var mailOptions = {
         from: '"Gimmi" <no-reply@gimmi.be>',
         to: req.body.to,
@@ -48,9 +47,30 @@ router.post('/', (req, res, next) => {
         console.log('Message sent: %s (%s)', info.messageId, info.response);
         res.status(250).json(info.messageId);
     });
-});
+};
 
-module.exports = router;
+// Send an email from server
+exports.sendLocal = function (to, subject, html) {
+    var mailOptions = {
+        from: '"Gimmi" <no-reply@gimmi.be>',
+        to: to,
+        subject: subject,
+        html: html //geen text-value meer ==> html wordt naar text omgezet
+    };
+
+    smtpTransporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error(error);
+            var info = {
+                error: error,
+                message: 'Mail not sent.'
+            }
+            return info;
+        }
+        console.log('Message sent: %s (%s)', info.messageId, info.response);
+        return info;
+    });
+};
 
 // user MHP = no-reply@test.gimmi.be
 // password MHP = testGimmi1
