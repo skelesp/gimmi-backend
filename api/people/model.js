@@ -11,7 +11,9 @@ var personSchema = new db.Schema({
     type: {
       local: {
         type: {
-          password: { type: String, required: true }
+          password: { type: String, required: true },
+          resetPasswordToken: {type: String },
+          resetPasswordExpires: {type: Date }
         },
         required: false
       },
