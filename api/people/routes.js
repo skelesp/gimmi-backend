@@ -6,24 +6,33 @@ var Person = require('./class');
 
 peopleRouter.route('/')
     .get(Person.getAll)
-    .post(Person.register);
+    .post(Person.register)
+;
 
 peopleRouter.route('/:id')
     .get(Person.getByID)
     .put(Person.update)
-    .delete();
+    .delete()
+;
 peopleRouter.route('/email/:email')
-    .get(Person.getByEmail);
+    .get(Person.getByEmail)
+;
 peopleRouter.route('/:id/name')
-    .get(Person.getNameByID);
+    .get(Person.getNameByID)
+;
 
 // Accounts API
 // Local Gimmi account
 peopleRouter.route('/:id/account/local')
-    .put(Person.updateLocalPassword);
+    .put(Person.updateLocalPassword)
+;
+peopleRouter.route('/account/local')
+    .delete(Person.resetPassword)
+;
 
 // Facebook account
 peopleRouter.route('/:id/account/facebook')
-    .delete(Person.deleteFacebookAccount);
+    .delete(Person.deleteFacebookAccount)
+;
 
 module.exports = peopleRouter;

@@ -2,6 +2,8 @@ var router = require('express').Router();
 var jwt = require('jsonwebtoken');
 var Person = require('./model');
 var config = require('../../config');
+var crypto = require('crypto');
+var Mail = require('../../api/communication/mail/class');
 
 // --- Person API routes ---
 
@@ -333,6 +335,39 @@ exports.updateLocalPassword = function (req, res, next) {
         return next("No password provided");
     }
 };
+/**
+ * Reset password of Gimmi account.
+ * @param email The emailadress of the person who wants to reset his/her password.
+ */
+exports.resetPassword = function (req, res, next) {
+    if (req.body.email) {
+        var email = req.body.email;
+        Person.findOne({email : email}, function (err, person) {  //find person with the corresponding email
+            if (err) return next(err);
+            if (!person) {
+                res.status(404).json({
+                    error: "not found"
+                });
+            } else {
+                var token = createRandomToken();
+                person.accounts.local.resetPasswordToken = token;
+                person.accounts.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+                person.markModified('accounts.local.resetPasswordToken');
+                person.markModified('accounts.local.resetPasswordExpires');
+                person.save(function (err, person, numAffected) {
+                    if (err) return next(err);
+                    console.log("Password has been reset for person " + person._id);
+                    Mail.sendLocal(person.email, "[GIMMI] Paswoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord op http://www.gimmi.be heeft aangevraagd. " +
+                        "Klik op onderstaande link om je paswoord te resetten (deze link is 1 uur geldig): <br />" +
+                        "http://www.gimmi.be/#/reset/" + token +
+                        "Als je zelf geen paswoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw paswoord blijft ongewijzigd.");
+                    res.status(200).json();
+                });
+            }
+        });
+    }
+}
 
 // Facebook account
 exports.deleteFacebookAccount = function (req, res, next) {
@@ -354,6 +389,9 @@ exports.deleteFacebookAccount = function (req, res, next) {
 ///////////////////////
 // Private functions //
 ///////////////////////
+function createRandomToken() {
+    return crypto.randomBytes(20).toString('hex');
+}
 
 function createJWTtoken(person) {
     // Create a token
