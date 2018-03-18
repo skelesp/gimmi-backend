@@ -27,7 +27,7 @@ peopleRouter.route('/:id/account/local')
     .put(Person.updateLocalPassword)
 ;
 peopleRouter.route('/account/local')
-    .delete(Person.resetPassword)
+    .delete(Person.requestPasswordReset)
 ;
 
 // Facebook account

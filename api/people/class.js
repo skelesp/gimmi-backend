@@ -338,8 +338,9 @@ exports.updateLocalPassword = function (req, res, next) {
 /**
  * Reset password of Gimmi account.
  * @param email The emailadress of the person who wants to reset his/her password.
+ * @param source The source (url/app/...) from which the password reset was sent.
  */
-exports.resetPassword = function (req, res, next) {
+exports.requestPasswordReset = function (req, res, next) {
     if (req.body.email) {
         var email = req.body.email;
         Person.findOne({email : email}, function (err, person) {  //find person with the corresponding email
@@ -358,13 +359,19 @@ exports.resetPassword = function (req, res, next) {
                 person.save(function (err, person, numAffected) {
                     if (err) return next(err);
                     console.log("Password has been reset for person " + person._id);
-                    Mail.sendLocal(person.email, "[GIMMI] Paswoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord op http://www.gimmi.be heeft aangevraagd. " +
-                        "Klik op onderstaande link om je paswoord te resetten (deze link is 1 uur geldig): <br />" +
-                        "http://www.gimmi.be/#/reset/" + token +
-                        "Als je zelf geen paswoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw paswoord blijft ongewijzigd.");
+                    var source = req.body.source ? req.body.source : "http://www.gimmi.be"
+                    Mail.sendLocal(person.email, "[GIMMI] Paswoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord op " +
+                        source + " heeft aangevraagd. " +
+                        "Klik op onderstaande link om je paswoord te resetten (deze link is 1 uur geldig): <br /> " +
+                        source + "/#/resetPassword/" + token +
+                        " <br /><br />Als je zelf geen paswoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw paswoord blijft ongewijzigd.");
                     res.status(200).json();
                 });
             }
+        });
+    } else {
+        res.status(404).json({
+            error: "no email provided"
         });
     }
 }
