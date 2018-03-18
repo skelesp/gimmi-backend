@@ -376,6 +376,57 @@ exports.requestPasswordReset = function (req, res, next) {
     }
 }
 
+exports.validatePasswordResetToken = function (req, res, next) {
+    if (req.params.token) {
+        Person.findOne(
+            { "accounts.local.resetPasswordToken": req.params.token, "accounts.local.resetPasswordExpires": { $gt: new Date() } }, 
+            { _id: 0, "firstName": 1, "accounts.local.resetPasswordToken": 1, "accounts.local.resetPasswordExpires": 1 },
+            function(err, tokenInfo) {
+                if (err || !tokenInfo) {
+                    res.status(404).json({error: "Token not found"})
+                } else {
+                    tokenInfo = tokenInfo.toObject();
+                    var result = {
+                        firstName: tokenInfo.firstName,
+                        token: tokenInfo.accounts.local.resetPasswordToken,
+                        expiresOn: tokenInfo.accounts.local.resetPasswordExpires
+                    }
+                    res.status(200).json(result);
+                }
+            }
+        )
+    }
+}
+
+exports.resetPassword = function(req, res, next) {
+    if (req.params.token) {
+        Person.findOne(
+            { "accounts.local.resetPasswordToken": req.params.token, "accounts.local.resetPasswordExpires": { $gt: new Date() } }, 
+            function (err, person) {  //find person with the corresponding ID
+            if (err) return next(err);
+            if (!person.accounts.local) { // if person doesn't have a local account: add a local account with password
+                person.accounts.local = { "password": req.body.pw };
+            } else { // if person has local account: update password
+                person.accounts.local.password = req.body.pw;
+            }
+            delete person.accounts.local.resetPasswordToken;
+            delete person.accounts.local.resetPasswordExpires;
+            person.markModified('accounts.local.password');
+            person.markModified('accounts.local.resetPasswordToken');
+            person.markModified('accounts.local.resetPasswordExpires');
+            person.save(function (err, person, numAffected) {
+                if (err) return next(err);
+
+                Mail.sendLocal(person.email, "[GIMMI] Uw paswoord werd gewijzigd", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord uitgevoerd heeft op http://www.gimmi.be .<br /> " +
+                "<br />Als je zelf geen paswoord reset hebt uitgevoerd, gelieve ons zo snel mogelijk te contacteren op info@gimmi.be .");
+                res.status(200).json(person);
+            });
+        });
+
+    } else {
+        return next("No password provided");
+    }
+}
 // Facebook account
 exports.deleteFacebookAccount = function (req, res, next) {
     Person.findByIdAndUpdate(req.params.id, { $unset: { "accounts.facebook": "" } }, { new: true }, function (err, person) {
