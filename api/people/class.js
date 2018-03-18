@@ -351,7 +351,7 @@ exports.resetPassword = function (req, res, next) {
             } else {
                 var token = createRandomToken();
                 person.accounts.local.resetPasswordToken = token;
-                person.accounts.local.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+                person.accounts.local.resetPasswordExpires = new Date(Date.now() + (1*60*60*1000)); // 1 hour
 
                 person.markModified('accounts.local.resetPasswordToken');
                 person.markModified('accounts.local.resetPasswordExpires');
