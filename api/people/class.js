@@ -2,6 +2,8 @@ var router = require('express').Router();
 var jwt = require('jsonwebtoken');
 var Person = require('./model');
 var config = require('../../config');
+var crypto = require('crypto');
+var Mail = require('../../api/communication/mail/class');
 
 // --- Person API routes ---
 
@@ -333,7 +335,98 @@ exports.updateLocalPassword = function (req, res, next) {
         return next("No password provided");
     }
 };
+/**
+ * Reset password of Gimmi account.
+ * @param email The emailadress of the person who wants to reset his/her password.
+ * @param source The source (url/app/...) from which the password reset was sent.
+ */
+exports.requestPasswordReset = function (req, res, next) {
+    if (req.body.email) {
+        var email = req.body.email;
+        Person.findOne({email : email}, function (err, person) {  //find person with the corresponding email
+            if (err) return next(err);
+            if (!person) {
+                res.status(404).json({
+                    error: "not found"
+                });
+            } else {
+                var token = createRandomToken();
+                person.accounts.local.resetPasswordToken = token;
+                person.accounts.local.resetPasswordExpires = new Date(Date.now() + (1*60*60*1000)); // 1 hour
 
+                person.markModified('accounts.local.resetPasswordToken');
+                person.markModified('accounts.local.resetPasswordExpires');
+                person.save(function (err, person, numAffected) {
+                    if (err) return next(err);
+                    console.log("Password has been reset for person " + person._id);
+                    var source = req.body.source ? req.body.source : "http://www.gimmi.be"
+                    Mail.sendLocal(person.email, "[GIMMI] Paswoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord op " +
+                        source + " heeft aangevraagd. " +
+                        "Klik op onderstaande link om je paswoord te resetten (deze link is 1 uur geldig): <br /> " +
+                        source + "/#/resetPassword/" + token +
+                        " <br /><br />Als je zelf geen paswoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw paswoord blijft ongewijzigd.");
+                    res.status(200).json();
+                });
+            }
+        });
+    } else {
+        res.status(404).json({
+            error: "no email provided"
+        });
+    }
+}
+
+exports.validatePasswordResetToken = function (req, res, next) {
+    if (req.params.token) {
+        Person.findOne(
+            { "accounts.local.resetPasswordToken": req.params.token, "accounts.local.resetPasswordExpires": { $gt: new Date() } }, 
+            { _id: 0, "firstName": 1, "accounts.local.resetPasswordToken": 1, "accounts.local.resetPasswordExpires": 1 },
+            function(err, tokenInfo) {
+                if (err || !tokenInfo) {
+                    res.status(404).json({error: "Token not found"})
+                } else {
+                    tokenInfo = tokenInfo.toObject();
+                    var result = {
+                        firstName: tokenInfo.firstName,
+                        token: tokenInfo.accounts.local.resetPasswordToken,
+                        expiresOn: tokenInfo.accounts.local.resetPasswordExpires
+                    }
+                    res.status(200).json(result);
+                }
+            }
+        )
+    }
+}
+
+exports.resetPassword = function(req, res, next) {
+    if (req.params.token) {
+        Person.findOne(
+            { "accounts.local.resetPasswordToken": req.params.token, "accounts.local.resetPasswordExpires": { $gt: new Date() } }, 
+            function (err, person) {  //find person with the corresponding ID
+            if (err) return next(err);
+            if (!person.accounts.local) { // if person doesn't have a local account: add a local account with password
+                person.accounts.local = { "password": req.body.pw };
+            } else { // if person has local account: update password
+                person.accounts.local.password = req.body.pw;
+            }
+            delete person.accounts.local.resetPasswordToken;
+            delete person.accounts.local.resetPasswordExpires;
+            person.markModified('accounts.local.password');
+            person.markModified('accounts.local.resetPasswordToken');
+            person.markModified('accounts.local.resetPasswordExpires');
+            person.save(function (err, person, numAffected) {
+                if (err) return next(err);
+
+                Mail.sendLocal(person.email, "[GIMMI] Uw paswoord werd gewijzigd", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord uitgevoerd heeft op http://www.gimmi.be .<br /> " +
+                "<br />Als je zelf geen paswoord reset hebt uitgevoerd, gelieve ons zo snel mogelijk te contacteren op info@gimmi.be .");
+                res.status(200).json(person);
+            });
+        });
+
+    } else {
+        return next("No password provided");
+    }
+}
 // Facebook account
 exports.deleteFacebookAccount = function (req, res, next) {
     Person.findByIdAndUpdate(req.params.id, { $unset: { "accounts.facebook": "" } }, { new: true }, function (err, person) {
@@ -354,6 +447,9 @@ exports.deleteFacebookAccount = function (req, res, next) {
 ///////////////////////
 // Private functions //
 ///////////////////////
+function createRandomToken() {
+    return crypto.randomBytes(20).toString('hex');
+}
 
 function createJWTtoken(person) {
     // Create a token

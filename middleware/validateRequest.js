@@ -22,6 +22,18 @@ var unprotectedRestCalls = [
     { // Get username by ID
         route: '/api/people/*/name',
         method: 'GET'
+    },
+    { // Reset password
+        route: '/api/people/account/local',
+        method: 'DELETE'
+    },
+    { // Validate token
+        route: '/api/people/account/local/*',
+        method: 'GET'
+    },
+    { // Set new password
+        route: '/api/people/account/local/*',
+        method: 'PUT'
     }
 ];
 
