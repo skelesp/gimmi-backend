@@ -3,14 +3,16 @@ var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var config = require('./config');
-var mongoose = require('mongoose');
+var fs = require('fs');
+var https = require('https');
 
 // ========================
 // = Server configuration =
 // ========================
 
 // Set variables
-var port = process.env.PORT || config.api_port  //Port to access the API
+var port = process.env.PORT || config.api_port;  //Port to access the API
+var nodeEnv = process.env.NODE_ENV || 'dev';
 
 // Use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -59,7 +61,21 @@ process.on('uncaughtException', function(err) {
 // ====================
 // = start the server =
 // ====================
-
-var server = app.listen(port, function(){
-  console.log('Server running @ port '+server.address().port)
-})
+console.log("Environment = " + nodeEnv);
+if (nodeEnv === 'dev') {
+  var options = {
+    key: fs.readFileSync('./sslcert/localhost.key'),
+    cert: fs.readFileSync('./sslcert/localhost.pem'),
+    requestCert: false,
+    rejectUnauthorized: false
+  };
+  var server = https.createServer(options, app).listen(port, function() {
+    console.log('HTTPS Server running @ port ' + server.address().port);
+  });
+} else {
+  // On Heroku, SSL termination is used, so no need for a HTTPS server. Communication on server is in HTTP.
+  // So in production/test : no need to set up a HTTPS server.
+  var server = app.listen(port, function () {
+    console.log('HTTP Server running @ port ' + server.address().port)
+  })
+};
