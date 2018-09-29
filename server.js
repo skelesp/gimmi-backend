@@ -13,12 +13,6 @@ var https = require('https');
 // Set variables
 var port = process.env.PORT || config.api_port;  //Port to access the API
 var nodeEnv = process.env.NODE_ENV || 'dev';
-var options = {
-  key : fs.readFileSync( './sslcert/localhost.key' ),
-  cert : fs.readFileSync( './sslcert/localhost.pem' ),
-  requestCert: false,
-  rejectUnauthorized: false
-};
 
 // Use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -69,6 +63,12 @@ process.on('uncaughtException', function(err) {
 // ====================
 console.log("Environment = " + nodeEnv);
 if (nodeEnv === 'dev') {
+  var options = {
+    key: fs.readFileSync('./sslcert/localhost.key'),
+    cert: fs.readFileSync('./sslcert/localhost.pem'),
+    requestCert: false,
+    rejectUnauthorized: false
+  };
   var server = https.createServer(options, app).listen(port, function() {
     console.log('HTTPS Server running @ port ' + server.address().port);
   });
