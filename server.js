@@ -43,7 +43,8 @@ app.all('/*', require('./middleware/validateRequest'));
 
 app.use('/dev', require('./api/dev/dev-api'));
 app.use('/api/email', require('./api/communication/mail/routes'));
-app.use('/api/gcse', require('./api/gcse/gcse-api'));
+app.use('/api/gcse', require('./api/images/gcse-api'));
+app.use('/api/cloudinary', require('./api/images/cloudinary-api'));
 app.use('/api/people', require('./api/people/routes'));
 app.use('/api/authenticate', require('./api/auth/routes'));
 app.use('/api/wishlist', require('./api/wishes/wishlist/routes'));
