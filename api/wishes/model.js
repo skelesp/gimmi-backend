@@ -13,7 +13,10 @@ var WishSchema = new db.Schema(
     title: {type: String, required: true},
     price: {type: Number, required: false},
     url: {type: String, required: false},
-    image: {type: String, required: false},
+    image: {type: {
+      public_id: { type: String, require: true},
+      version: { type: String, required: true}
+    }, required: false},
     color: {type: String, required: false},
     size: {type: String, required: false},
     description: {type: String, required: false},
