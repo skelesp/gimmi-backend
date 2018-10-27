@@ -91,7 +91,7 @@ function uploadToCloudinary (url, wishID, callback) {
                 Wish.findOneAndUpdate(
                     { _id: wishID}, 
                     {image: {
-                        public_id: wishID, 
+                        public_id: result.public_id, 
                         version: result.version
                     }},
                     {new: true}, 
