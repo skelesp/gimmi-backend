@@ -1,32 +1,36 @@
+/**
+ * Cloudinary controller for image API
+ */
+
 var Wish = require("../../wishes/model");
 var async = require('async');
 var urlExists = require('url-exists');
 var cloudinary = require('cloudinary');
+var secret = process.env.CLOUDINARY_SECRET;
+var cloudinary_api_key = process.env.CLOUDINARY_API_KEY;
+var upload_preset = 'wish_images'
 
 cloudinary.config({
     cloud_name: 'hunk4smqo',
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_SECRET
+    api_key: cloudinary_api_key,
+    api_secret: secret
 });
-
-var UploadedToCloudinary = [];
-var BrokenLinks = [];
-var DefaultImages = [];
-var failedUploadsToCloudinary = [];
-var allLinks = [];
-var i = 0;
-var secret = process.env.CLOUDINARY_SECRET;
 
 // EXPORTS
 exports.generateSignature = function (req, res, next) {
     //https://support.cloudinary.com/hc/en-us/articles/203817991-How-to-generate-a-Cloudinary-signature-on-my-own-
     //https://cloudinary.com/documentation/upload_images#generating_authentication_signatures
     var params_to_sign = req.body ? req.body : {};
-    var secret = process.env.CLOUDINARY_SECRET;
     var signature = cloudinary.utils.api_sign_request(params_to_sign, secret);
     res.status(201).json(signature);
 }
 exports.migrate = function (req, res, next) {
+    var UploadedToCloudinary = [];
+    var BrokenLinks = [];
+    var DefaultImages = [];
+    var failedUploadsToCloudinary = [];
+    var allLinks = [];
+
     Wish.find({ "image.version": { $exists: false } }, (err, wishesWithOldImage) => {
         async.each(wishesWithOldImage, convertOldImageToCloudinary, function(err) {
             if (err) {
@@ -42,6 +46,34 @@ exports.migrate = function (req, res, next) {
             
             res.status(201).json(summary);
         });
+    });
+}
+exports.deleteImage = function (req, res, next) {
+    var public_id = decodeURI(req.params.public_id);
+    cloudinary.v2.uploader.destroy(public_id, function(error, result){
+        if (error) {
+            next(error.message);
+        }
+        if (result.result === "ok") {
+            console.log("Verwijderde afbeelding: " + public_id);
+            res.status(200).json({delete: "ok"});
+        } else {
+            next(result.result);
+        }
+    });
+}
+exports.renameImage = function (req, res, next) {
+    var public_id = decodeURI(req.params.public_id); // Get public_id from URL
+    var folder = splitFolderAndIdFromPublicId(public_id).folder; // Get folder from public_id
+    var new_id = folder ? folder + req.body.new_public_id : req.body.new_public_id; // Add folder to new image name
+    cloudinary.v2.uploader.rename(public_id, new_id, function (error, result) {
+        console.log(error, result);
+        if (error) {
+            next(error.message);
+        }
+        if (result) {
+            res.status(200).json(result);
+        }
     });
 }
 // FUNCTIONS
@@ -76,10 +108,9 @@ function convertOldImageToCloudinary (wish, callback) {
 }
 
 function uploadToCloudinary (url, wishID, callback) {
-    var upload_preset = 'wish_images';
     var upload_options = {
         public_id: wishID,
-        upload_preset: 'wish_images'
+        upload_preset: upload_preset
     }
 
     cloudinary.v2.uploader.upload(url, upload_options,
@@ -101,4 +132,15 @@ function uploadToCloudinary (url, wishID, callback) {
             }
         }
     );
+}
+function splitFolderAndIdFromPublicId (public_id){
+    var res = public_id.split("/");
+    var id = res[res.length - 1];
+    res.pop();
+    var folder = res.join("/");
+    folder = (folder === "") ? null : (folder + "/");
+    return {
+        id: id,
+        folder: folder
+    }
 }

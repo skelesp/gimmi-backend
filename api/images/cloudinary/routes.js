@@ -1,8 +1,16 @@
-var router = require('express').Router();
-var cloudinaryAPI = require('./class');
+var imageRouter = require('express').Router();
+var cloudinaryAPI = require('./controller');
 
-router.post('/signature/', cloudinaryAPI.generateSignature);
+imageRouter.route('/signature')
+    .post(cloudinaryAPI.generateSignature);
 
-router.put('/migrateOldImages/', cloudinaryAPI.migrate);
+imageRouter.route('/migrateOldImages')
+    .put(cloudinaryAPI.migrate);
 
-module.exports = router;
+imageRouter.route('/:public_id')
+    .delete(cloudinaryAPI.deleteImage);
+
+imageRouter.route('/:public_id/public_id')
+    .put(cloudinaryAPI.renameImage);
+
+module.exports = imageRouter;
