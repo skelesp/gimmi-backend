@@ -8,10 +8,11 @@ var urlExists = require('url-exists');
 var cloudinary = require('cloudinary');
 var secret = process.env.CLOUDINARY_SECRET;
 var cloudinary_api_key = process.env.CLOUDINARY_API_KEY;
-var upload_preset = 'wish_images'
+var cloudinary_cloud_name = process.env.CLOUDINARY_CLOUD_NAME;
+var upload_preset = 'wish_images';
 
 cloudinary.config({
-    cloud_name: 'hunk4smqo',
+    cloud_name: cloudinary_cloud_name,
     api_key: cloudinary_api_key,
     api_secret: secret
 });
@@ -50,7 +51,10 @@ exports.migrate = function (req, res, next) {
 }
 exports.deleteImage = function (req, res, next) {
     var public_id = decodeURI(req.params.public_id);
-    cloudinary.v2.uploader.destroy(public_id, function(error, result){
+    var options = {
+        invalidate: true
+    }
+    cloudinary.v2.uploader.destroy(public_id, options, function(error, result){
         if (error) {
             next(error.message);
         }
@@ -66,8 +70,11 @@ exports.renameImage = function (req, res, next) {
     var public_id = decodeURI(req.params.public_id); // Get public_id from URL
     var folder = splitFolderAndIdFromPublicId(public_id).folder; // Get folder from public_id
     var new_id = folder ? folder + req.body.new_public_id : req.body.new_public_id; // Add folder to new image name
-    cloudinary.v2.uploader.rename(public_id, new_id, function (error, result) {
-        console.log(error, result);
+    var options = {
+        overwrite: true,
+        invalidate: true
+    }
+    cloudinary.v2.uploader.rename(public_id, new_id, options, function (error, result) {
         if (error) {
             next(error.message);
         }
