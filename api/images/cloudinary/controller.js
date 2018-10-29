@@ -25,12 +25,16 @@ exports.generateSignature = function (req, res, next) {
     var signature = cloudinary.utils.api_sign_request(params_to_sign, secret);
     res.status(201).json(signature);
 }
+
+/**
+ * Migration script to upgrade old URL based images to cloudinary images
+ */
+var UploadedToCloudinary = [];
+var BrokenLinks = [];
+var DefaultImages = [];
+var failedUploadsToCloudinary = [];
+var allLinks = [];
 exports.migrate = function (req, res, next) {
-    var UploadedToCloudinary = [];
-    var BrokenLinks = [];
-    var DefaultImages = [];
-    var failedUploadsToCloudinary = [];
-    var allLinks = [];
 
     Wish.find({ "image.version": { $exists: false } }, (err, wishesWithOldImage) => {
         async.each(wishesWithOldImage, convertOldImageToCloudinary, function(err) {
