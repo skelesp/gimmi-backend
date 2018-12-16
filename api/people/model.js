@@ -7,6 +7,22 @@ var personSchema = new db.Schema({
   lastName: {type: String, required: true},
   birthday: {type: Date, required: false},
   email: {type: String, required: true, index: { unique: true } },
+  extraInfo: {
+    type: {
+      likes: [{
+        type: {
+          text: { type: String, required: true },
+          url: { type: String, required: true }
+        }
+      }],
+      dislikes: [{
+        type: {
+          text: { type: String, required: true },
+          url: { type: String, required: true }
+        }
+      }]
+    }
+  },
   accounts: {
     type: {
       local: {
