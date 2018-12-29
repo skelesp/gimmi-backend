@@ -1,4 +1,3 @@
-var router = require('express').Router();
 var jwt = require('jsonwebtoken');
 var Person = require('./model');
 var config = require('../../config');
@@ -152,6 +151,28 @@ exports.update = function (req, res, next) {
         });
     }
 };
+/**
+ * Update extra info for a person
+ * @param likes The things a person likes to receive as a gift
+ * @param dislikes The things a person doesn't like to receive as a gift
+ * @param id The ID of the person
+ */
+exports.updateExtraInfo = function (req, res, next) {
+    if (req.params.id === req.authenticatedUser._id) { // Check if the requesting user is the same as the requested person
+        Person.findOneAndUpdate(
+            { "_id": req.params.id }, //find person with the corresponding ID
+            { $set: { "extraInfo.likes": req.body.likes, "extraInfo.dislikes": req.body.dislikes} },
+            { new: true },
+            function (err, updatedPerson) {
+                if (err) { return next(err); }
+                res.status(200).json(updatedPerson);
+            });
+    } else {
+        res.status(403).json({
+            error: "403 - User tries to view/edit another user. This is forbidden."
+        });
+    }
+}
 
 //Authenticate
 exports.authenticate = function (req, res, next) {

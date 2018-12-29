@@ -1,5 +1,4 @@
 var peopleRouter = require('express').Router();
-var jwt = require('jsonwebtoken');
 var Person = require('./class');
 
 // --- Person API routes ---
@@ -19,6 +18,9 @@ peopleRouter.route('/email/:email')
 ;
 peopleRouter.route('/:id/name')
     .get(Person.getNameByID)
+;
+peopleRouter.route('/:id/extrainfo')
+    .put(Person.updateExtraInfo)
 ;
 
 // Accounts API

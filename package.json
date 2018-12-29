@@ -2,10 +2,14 @@
   "name": "gimmi",
   "version": "1.0.0",
   "author": "Stijn Beeckmans <stijn.beeckmans@gmail.com>",
+  "engines": {
+    "node": "8.10.0"
+  },
   "dependencies": {
     "async": "^2.6.0",
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",
+    "cloudinary": "^1.11.0",
     "express": "^4.15.5",
     "fs": "0.0.1-security",
     "gulp": "^3.9.1",
@@ -24,6 +28,7 @@
     "nodemailer": "^4.3.1",
     "nodemailer-html-to-text": "^2.1.0",
     "nodemon": "^1.12.1",
-    "request": "^2.82.0"
+    "request": "^2.82.0",
+    "url-exists": "^1.0.3"
   }
 }
