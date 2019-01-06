@@ -8,6 +8,14 @@ var reservationSchema = new db.Schema({
   hideUntil: {type: Date, required: false}
 });
 
+var giftFeedbackSchema = new db.Schema({
+  satisfaction: {type: String, required: false},
+  receivedOn: { type: Date, required: false },
+  closedOn: { type: Date, required: true },
+  message: {type: String, required: false},
+  putBackOnList: {type: Boolean, required: true}
+});
+
 var WishSchema = new db.Schema(
   {
     title: {type: String, required: true},
@@ -24,6 +32,7 @@ var WishSchema = new db.Schema(
     receiver: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     createdBy: {type: db.Schema.Types.ObjectId, ref:'Person', required: true},
     reservation: {type: reservationSchema, required: false},
+    giftFeedback: { type: giftFeedbackSchema, required: false },
     copyOf: { type: db.Schema.Types.ObjectId, ref:"Wish", required: false}
   },
   {
