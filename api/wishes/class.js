@@ -2,7 +2,6 @@ var Wish = require('./model');
 var _ = require('lodash');
 
 // --- Wish class ---
-
 // Create a wish
 exports.create = function (req, res, next) {
     var wish = new Wish({
@@ -58,6 +57,7 @@ exports.delete = function (req, res, next) {
     })
 };
 
+// --- Reservation class --
 // Reserve a wish
 exports.reserve = function (req, res, next) {
     Wish.findOneAndUpdate({ _id: req.params.id },
@@ -88,6 +88,29 @@ exports.unreserve = function (req, res, next) {
             res.status(201).json(doc);
         });
 };
+
+// --- Feedback class ---
+exports.addFeedback = function(req, res, next)  {
+    var feedback = req.body;
+    var wishID = req.params.id;
+    Wish.findOneAndUpdate({ _id: wishID },{ giftFeedback: feedback },
+        { new: true })
+        .populate('createdBy', 'firstName lastName')
+        .populate('reservation.reservedBy', 'firstName lastName')
+        .exec(function (err, doc) {
+            if (err) { res.send({ msg: 'Reservation failed' }, 404); }
+            res.status(201).json(doc);
+        });
+}
+exports.deleteFeedback = function (req, res, next) {
+    Wish.findOneAndUpdate({ _id: req.params.id }, { $unset: { giftFeedback: "" } }, { new: true })
+        .populate('createdBy', 'firstName lastName')
+        .populate('reservation.reservedBy', 'firstName lastName')
+        .exec(function (err, doc) {
+            if (err) { res.send({ msg: 'Reservation delete failed' }, 404); }
+            res.status(201).json(doc);
+        });
+}
 
 // Private functions
 function convertNovalueToUndefined(object) {
