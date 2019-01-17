@@ -14,8 +14,8 @@ wishRouter.route('/:id/feedback')
     .post(Wish.addFeedback)
     .put(Wish.addFeedback)
     .delete(Wish.deleteFeedback);
-/* wishRouter.route('/:id/closure')
-    .post(Wish.addClosure); */
+wishRouter.route('/:id/closure')
+    .post(Wish.close);
 // --- Reservation API routes ---
 wishRouter.route('/:id/reservation')
     .post(Wish.reserve)

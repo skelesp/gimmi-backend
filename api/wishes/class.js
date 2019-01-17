@@ -49,6 +49,20 @@ exports.update = function (req, res, next) {
         });
 };
 
+// Close a wish
+exports.close = function (req, res, next) {
+    var closure = req.body;
+    var wishID = req.params.id;
+    Wish.findOneAndUpdate({ _id: wishID }, { closure: closure },
+        { new: true })
+        .populate('createdBy', 'firstName lastName')
+        .populate('reservation.reservedBy', 'firstName lastName')
+        .exec(function (err, doc) {
+            if (err) { res.send({ msg: 'Adding closure failed' }, 404); }
+            res.status(201).json(doc);
+        });
+}
+
 // Delete a wish
 exports.delete = function (req, res, next) {
     Wish.findByIdAndRemove(req.params.id, function (err, post) {
@@ -98,7 +112,7 @@ exports.addFeedback = function(req, res, next)  {
         .populate('createdBy', 'firstName lastName')
         .populate('reservation.reservedBy', 'firstName lastName')
         .exec(function (err, doc) {
-            if (err) { res.send({ msg: 'Reservation failed' }, 404); }
+            if (err) { res.send({ msg: 'Adding feedback failed' }, 404); }
             res.status(201).json(doc);
         });
 }

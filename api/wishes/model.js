@@ -6,14 +6,20 @@ var reservationSchema = new db.Schema({
   reservationDate: {type: Date, required: true},
   reason: {type: String, required: false},
   hideUntil: {type: Date, required: false}
-});
+}, { timestamps: true });
 
 var giftFeedbackSchema = new db.Schema({
   satisfaction: {type: String, required: false},
   receivedOn: { type: Date, required: false },
   message: {type: String, required: false},
   putBackOnList: {type: Boolean, required: true}
-});
+}, { timestamps: true });
+
+var closureSchema = new db.Schema({
+  closedBy: { type: db.Schema.Types.ObjectId, ref: 'Person', required: false },
+  closedOn: { type: Date, required: true },
+  reason: {type: String, required: true}
+}, { _id: false, timestamps: true });
 
 var WishSchema = new db.Schema(
   {
@@ -33,7 +39,7 @@ var WishSchema = new db.Schema(
     reservation: {type: reservationSchema, required: false},
     giftFeedback: { type: giftFeedbackSchema, required: false },
     copyOf: { type: db.Schema.Types.ObjectId, ref:"Wish", required: false},
-    closedOn: { type: Date, required: false }
+    closure: { type: closureSchema, required: false }
   },
   {
     timestamps: true
