@@ -5,7 +5,7 @@ var reservationSchema = new db.Schema({
   amount: {type: Number, required: true},
   reservationDate: {type: Date, required: true},
   reason: {type: String, required: false},
-  hideUntil: {type: Date, required: false}
+  handoverDate: {type: Date, required: false}
 }, { timestamps: true });
 
 var giftFeedbackSchema = new db.Schema({
