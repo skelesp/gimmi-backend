@@ -38,6 +38,8 @@ exports.getWishlist = function (req, res, next) {
                         createdAt: "$createdAt",
                         createdBy: "$creator",
                         reservation: "$reservation",
+                        giftFeedback: "$giftFeedback",
+                        closure: "$closure",
                         copyOf: "$copyOf"
                     }
                 },

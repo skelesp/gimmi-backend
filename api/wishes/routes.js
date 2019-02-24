@@ -6,12 +6,16 @@ var Wish = require('./class');
 
 wishRouter.route('/')
     .post(Wish.create);
-
 wishRouter.route('/:id')
     .get(Wish.get)
     .put(Wish.update)
     .delete(Wish.delete);
-
+wishRouter.route('/:id/feedback')
+    .post(Wish.addFeedback)
+    .put(Wish.addFeedback)
+    .delete(Wish.deleteFeedback);
+wishRouter.route('/:id/closure')
+    .post(Wish.close);
 // --- Reservation API routes ---
 wishRouter.route('/:id/reservation')
     .post(Wish.reserve)
