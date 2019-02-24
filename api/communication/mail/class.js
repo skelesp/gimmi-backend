@@ -4,21 +4,21 @@ var htmlToText = require('nodemailer-html-to-text').htmlToText;
 
 // Setup mailobject
 var smtpTransporter = nodemailer.createTransport({
-    host: 'smtp.mijnhostingpartner.nl',
-    port: 587,
+    host: process.env.MAIL_HOST,
+    port: process.env.MAIL_PORT,
     secure: false,
     auth: {
-        user: "no-reply@test.gimmi.be",
-        pass: "testGimmi1"
+        user: process.env.MAIL_LOGIN,
+        pass: process.env.MAIL_PASSWORD
     }
 });
 
 // verify connection configuration
 smtpTransporter.verify(function (error, success) {
     if (error) {
-        console.log(error);
+        console.error(error);
     } else {
-        console.log('Mailserver is connected');
+        console.info(`Mailserver (${process.env.MAIL_HOST} : ${process.env.MAIL_PORT}) is connected with user ${process.env.MAIL_LOGIN}`);
     }
 });
 
@@ -28,7 +28,7 @@ smtpTransporter.use('compile', htmlToText()); //The plugin checks if there is no
 // Send an email via API
 exports.sendViaAPI = function (req, res, next) {
     var mailOptions = {
-        from: '"Gimmi" <no-reply@gimmi.be>',
+        from: `Gimmi <${process.env.MAIL_LOGIN}>`,
         to: req.body.to,
         subject: req.body.subject,
         html: req.body.html //geen text-value meer ==> html wordt naar text omgezet
@@ -52,7 +52,7 @@ exports.sendViaAPI = function (req, res, next) {
 // Send an email from server
 exports.sendLocal = function (to, subject, html) {
     var mailOptions = {
-        from: '"Gimmi" <no-reply@gimmi.be>',
+        from: `Gimmi <${process.env.MAIL_LOGIN}>`,
         to: to,
         subject: subject,
         html: html //geen text-value meer ==> html wordt naar text omgezet
