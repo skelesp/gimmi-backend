@@ -19,6 +19,9 @@ peopleRouter.route('/email/:email')
 peopleRouter.route('/:id/name')
     .get(Person.getNameByID)
 ;
+peopleRouter.route('/:id/email')
+    .get(Person.getEmailByID)
+;
 peopleRouter.route('/:id/extrainfo')
     .put(Person.updateExtraInfo)
 ;

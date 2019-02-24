@@ -25,32 +25,27 @@ exports.generateSignature = function (req, res, next) {
     var signature = cloudinary.utils.api_sign_request(params_to_sign, secret);
     res.status(201).json(signature);
 }
-
 /**
- * Migration script to upgrade old URL based images to cloudinary images
+ * Upload an image for a wish
+ * @param public_id The unique ID for the image (best practice: equals wish._id)
+ * @param image The url where the image can be found or actual image
  */
-var UploadedToCloudinary = [];
-var BrokenLinks = [];
-var DefaultImages = [];
-var failedUploadsToCloudinary = [];
-var allLinks = [];
-exports.migrate = function (req, res, next) {
-
-    Wish.find({ "image.version": { $exists: false } }, (err, wishesWithOldImage) => {
-        async.each(wishesWithOldImage, convertOldImageToCloudinary, function(err) {
-            if (err) {
-                console.log(`ERROR occured --> Check logs`);
-            }
-            var summary = {
-                uploaded: { total: UploadedToCloudinary.length, summary: UploadedToCloudinary},
-                brokenLinks: { total: BrokenLinks.length, summary: BrokenLinks},
-                defaultImages: { total: DefaultImages.length, summary: DefaultImages},
-                failedUploadsToCloudinary: { total: failedUploadsToCloudinary.length, summary: failedUploadsToCloudinary},
-                allLinks: {total: allLinks.length, summary: allLinks}
-            }
-            
-            res.status(201).json(summary);
-        });
+exports.uploadImage = function (req, res, next) {
+    var public_id = req.body.public_id;
+    var image = req.body.image;
+    var options = {
+        public_id: public_id,
+        invalidate: true,
+        upload_preset: "wish_images"
+    }
+    cloudinary.v2.uploader.upload(image, options, function (error, result) {
+        if (error) {
+            next(error.message);
+        }
+        if (result) {
+            console.log("Nieuwe afbeelding: " + result.public_id);
+            res.status(200).json(result);
+        }
     });
 }
 exports.deleteImage = function (req, res, next) {
@@ -88,10 +83,50 @@ exports.renameImage = function (req, res, next) {
     });
 }
 // FUNCTIONS
-function convertOldImageToCloudinary (wish, callback) {
+function splitFolderAndIdFromPublicId (public_id){
+    var res = public_id.split("/");
+    var id = res[res.length - 1];
+    res.pop();
+    var folder = res.join("/");
+    folder = (folder === "") ? null : (folder + "/");
+    return {
+        id: id,
+        folder: folder
+    }
+}
+
+// Migration script
+/**
+ * Migration script to upgrade old URL based images to cloudinary images
+ */
+var UploadedToCloudinary = [];
+var BrokenLinks = [];
+var DefaultImages = [];
+var failedUploadsToCloudinary = [];
+var allLinks = [];
+exports.migrate = function (req, res, next) {
+
+    Wish.find({ "image.version": { $exists: false } }, (err, wishesWithOldImage) => {
+        async.each(wishesWithOldImage, convertOldImageToCloudinary, function (err) {
+            if (err) {
+                console.log(`ERROR occured --> Check logs`);
+            }
+            var summary = {
+                uploaded: { total: UploadedToCloudinary.length, summary: UploadedToCloudinary },
+                brokenLinks: { total: BrokenLinks.length, summary: BrokenLinks },
+                defaultImages: { total: DefaultImages.length, summary: DefaultImages },
+                failedUploadsToCloudinary: { total: failedUploadsToCloudinary.length, summary: failedUploadsToCloudinary },
+                allLinks: { total: allLinks.length, summary: allLinks }
+            }
+
+            res.status(201).json(summary);
+        });
+    });
+}
+function convertOldImageToCloudinary(wish, callback) {
     var url = wish.image;
     var wishID = wish._id.toString();
-    
+
     urlExists(url, function (err, exists) {
         if (err) {
             console.log(err);
@@ -117,8 +152,7 @@ function convertOldImageToCloudinary (wish, callback) {
         }
     });
 }
-
-function uploadToCloudinary (url, wishID, callback) {
+function uploadToCloudinary(url, wishID, callback) {
     var upload_options = {
         public_id: wishID,
         upload_preset: upload_preset
@@ -131,27 +165,18 @@ function uploadToCloudinary (url, wishID, callback) {
             }
             if (result) {
                 Wish.findOneAndUpdate(
-                    { _id: wishID}, 
-                    {image: {
-                        public_id: result.public_id, 
-                        version: result.version
-                    }},
-                    {new: true}, 
+                    { _id: wishID },
+                    {
+                        image: {
+                            public_id: result.public_id,
+                            version: result.version
+                        }
+                    },
+                    { new: true },
                     (err, result) => {
                         callback(null);
-                });
+                    });
             }
         }
     );
-}
-function splitFolderAndIdFromPublicId (public_id){
-    var res = public_id.split("/");
-    var id = res[res.length - 1];
-    res.pop();
-    var folder = res.join("/");
-    folder = (folder === "") ? null : (folder + "/");
-    return {
-        id: id,
-        folder: folder
-    }
 }
