@@ -20,5 +20,8 @@ wishRouter.route('/:id/closure')
 wishRouter.route('/:id/reservation')
     .post(Wish.reserve)
     .delete(Wish.unreserve);
+    // --
+wishRouter.route('/:id/state')
+    .get(Wish.calculateState);
 
 module.exports = wishRouter;
