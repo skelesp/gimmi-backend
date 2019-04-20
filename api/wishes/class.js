@@ -150,7 +150,7 @@ function setWishStatus(wish) {
     var now = new Date();
     if (wish.closure) {
         wish.state = "Closed";
-    } else if (wish.reservation && wish.reservation.handoverDate < now.toISOString()) {
+    } else if (wish.reservation && wish.reservation.handoverDate < now) {
         wish.state = "Received";
     } else if (wish.reservation && !wish.closure) {
         wish.state = "Reserved";
