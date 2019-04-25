@@ -125,6 +125,16 @@ exports.deleteFeedback = function (req, res, next) {
             res.status(201).json(doc);
         });
 }
+// --- State ---
+exports.calculateState = function (req, res, next) {
+    Wish.findOne({ _id: req.params.id })
+        .exec(function (err, doc) {
+            if (err) { res.send({ msg: 'Wish not found' }, 404); }
+            var wishWithState = setWishStatus(doc);
+            var state = wishWithState.state;
+            res.status(201).json(state);
+        });
+}
 
 // Private functions
 function convertNovalueToUndefined(object) {
@@ -135,4 +145,17 @@ function convertNovalueToUndefined(object) {
             return value;
         }
     });
+}
+function setWishStatus(wish) {
+    var now = new Date();
+    if (wish.closure) {
+        wish.state = "Closed";
+    } else if (wish.reservation && wish.reservation.handoverDate < now) {
+        wish.state = "Received";
+    } else if (wish.reservation && !wish.closure) {
+        wish.state = "Reserved";
+    } else {
+        wish.state = "Open";
+    }
+    return wish;
 }
