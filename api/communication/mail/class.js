@@ -16,7 +16,7 @@ var smtpTransporter = nodemailer.createTransport({
 // verify connection configuration
 smtpTransporter.verify(function (error, success) {
     if (error) {
-        console.error(error);
+        console.error("ERROR while connecting to mailserver: ", error);
     } else {
         console.info(`Mailserver (${process.env.MAIL_HOST} : ${process.env.MAIL_PORT}) is connected with user ${process.env.MAIL_LOGIN}`);
     }
