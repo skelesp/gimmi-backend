@@ -1,0 +1,48 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('gimmiDEV');
+
+// The drop() command destroys all data from a collection.
+// Make sure you run it against proper database and collection.
+/* db.people.drop();
+db.wishes.drop(); */
+
+// Add an initial user
+var userId = "5f0207e39a554680bebb93e7";
+db.people.insert([
+  {
+    "_id" : ObjectId(userId),
+    "firstName": "Test",
+    "lastName": "Test",
+    "email": "testuser@test.be",
+    "birthday": "1985-07-07T22:00:00.000Z",
+    "accounts": {
+      "local": {
+        "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
+      }
+    }
+  }
+]);
+
+// Add wishes for user
+db.wishes.insert(
+  {
+    "title" : "Test on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141384,
+        "public_id" : "wish_images/59a9dc8c6282ae0011ae848f"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1
+}
+);
+
+// Query wishes for user
+db.wishes.find({receiver : ObjectId(userId)});
