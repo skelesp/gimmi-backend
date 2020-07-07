@@ -19,13 +19,15 @@
             "program": "${workspaceFolder}/server.js",
             "restart": true,
             "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen"
+            "internalConsoleOptions": "neverOpen",
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "type": "node",
             "request": "launch",
             "name": "Start Server",
-            "program": "${workspaceRoot}/server.js"
+            "program": "${workspaceRoot}/server.js",
+            "envFile": "${workspaceFolder}/.env"
         }
 
     ]
