@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible Node.js debug attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "attach",
+            "name": "Attach to Heroku",
+            "port": 9090,
+            "address": "localhost"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Nodemon server",
+            "runtimeExecutable": "nodemon",
+            "program": "${workspaceFolder}/server.js",
+            "restart": true,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Start Server",
+            "program": "${workspaceRoot}/server.js",
+            "envFile": "${workspaceFolder}/.env"
+        }
+
+    ]
+}

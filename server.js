@@ -11,6 +11,7 @@ var https = require('https');
 // ========================
 
 // Set variables
+require('dotenv').config(); // Load .env file into process.env
 var port = process.env.PORT || config.api_port;  //Port to access the API
 var nodeEnv = process.env.NODE_ENV || 'dev';
 
