@@ -8,8 +8,8 @@ use('gimmiDEV');
 
 // The drop() command destroys all data from a collection.
 // Make sure you run it against proper database and collection.
-/* db.people.drop();
-db.wishes.drop(); */
+db.people.drop();
+db.wishes.drop();
 
 // Add an initial user
 var userId = "5f0207e39a554680bebb93e7";
@@ -25,7 +25,19 @@ db.people.insert([
         "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
       }
     }
+  },
+  {
+  "_id": ObjectId("5f229c32d19589f8b835e79a"),
+  "firstName": "Stijn",
+  "lastName": "Beeckmans",
+  "email": "stijn.beeckmans@gmail.com",
+  "birthday": "1985-07-07T22:00:00.000Z",
+  "accounts": {
+    "local": {
+      "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
+    }
   }
+}
 ]);
 
 // Add wishes for user
