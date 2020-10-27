@@ -27,7 +27,7 @@ exports.register = function (req, res, next) {
             })
         } else {
             if (person) { // Person with same email found
-                //TODO: hier misschien ook controle op paswoord toevoegen : indien het klopt: token meegeven
+                //TODO: hier misschien ook controle op wachtwoord toevoegen : indien het klopt: token meegeven
                 console.log("user '" + person.email + "' tried to register again");
                 res.status(500).json({
                     type: false,
@@ -397,11 +397,11 @@ exports.requestPasswordReset = function (req, res, next) {
                     if (err) return next(err);
                     console.log("Password has been reset for person " + person._id);
                     var source = req.body.source ? req.body.source : "http://www.gimmi.be"
-                    Mail.sendLocal(person.email, "[GIMMI] Paswoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord op " +
+                    Mail.sendLocal(person.email, "[GIMMI] Wachtwoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je wachtwoord op " +
                         source + " heeft aangevraagd. " +
-                        "Klik op onderstaande link om je paswoord te resetten (deze link is 1 uur geldig): <br /> " +
+                        "Klik op onderstaande link om je wachtwoord te resetten (deze link is 1 uur geldig): <br /> " +
                         source + "/#/resetPassword/" + token +
-                        " <br /><br />Als je zelf geen paswoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw paswoord blijft ongewijzigd.");
+                        " <br /><br />Als je zelf geen wachtwoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw wachtwoord blijft ongewijzigd.");
                     res.status(200).json();
                 });
             }
@@ -454,8 +454,8 @@ exports.resetPassword = function(req, res, next) {
             person.save(function (err, person, numAffected) {
                 if (err) return next(err);
 
-                Mail.sendLocal(person.email, "[GIMMI] Uw paswoord werd gewijzigd", "<p>Je ontvangt deze mail omdat iemand een reset van je paswoord uitgevoerd heeft op http://www.gimmi.be .<br /> " +
-                "<br />Als je zelf geen paswoord reset hebt uitgevoerd, gelieve ons zo snel mogelijk te contacteren op info@gimmi.be .");
+                Mail.sendLocal(person.email, "[GIMMI] Uw wachtwoord werd gewijzigd", "<p>Je ontvangt deze mail omdat iemand een reset van je wachtwoord uitgevoerd heeft op http://www.gimmi.be .<br /> " +
+                "<br />Als je zelf geen wachtwoord reset hebt uitgevoerd, gelieve ons zo snel mogelijk te contacteren op info@gimmi.be .");
                 res.status(200).json(person);
             });
         });
