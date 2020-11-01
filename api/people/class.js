@@ -396,12 +396,11 @@ exports.requestPasswordReset = function (req, res, next) {
                 person.save(function (err, person, numAffected) {
                     if (err) return next(err);
                     console.log("Password has been reset for person " + person._id);
-                    var source = req.body.source ? req.body.source : "http://www.gimmi.be"
-                    Mail.sendLocal(person.email, "[GIMMI] Wachtwoord reset aangevraagd voor uw account", "<p>Je ontvangt deze mail omdat iemand een reset van je wachtwoord op " +
-                        source + " heeft aangevraagd. " +
-                        "Klik op onderstaande link om je wachtwoord te resetten (deze link is 1 uur geldig): <br /> " +
-                        source + "/#/resetPassword/" + token +
-                        " <br /><br />Als je zelf geen wachtwoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw wachtwoord blijft ongewijzigd.");
+                    var resetPasswordRoute = req.body.resetPasswordRoute.slice(-1) === '/' ? req.body.resetPasswordRoute : req.body.resetPasswordRoute + '/';
+                    Mail.sendLocal(person.email, 
+                        `[GIMMI] Wachtwoord reset aangevraagd voor uw account`, 
+                        `Beste<br /><br /><p>Je ontvangt deze mail omdat iemand een reset van je wachtwoord op Gimmi heeft aangevraagd. Klik op onderstaande link om je wachtwoord te resetten (deze link is 1 uur geldig): <br /> ` +
+                        resetPasswordRoute + token + `<br /><br />Als je zelf geen wachtwoord reset hebt aangevraagd, gelieve deze mail te negeren. Uw wachtwoord blijft ongewijzigd.`);
                     res.status(200).json();
                 });
             }
@@ -441,6 +440,9 @@ exports.resetPassword = function(req, res, next) {
             { "accounts.local.resetPasswordToken": req.params.token, "accounts.local.resetPasswordExpires": { $gt: new Date() } }, 
             function (err, person) {  //find person with the corresponding ID
             if (err) return next(err);
+            if (!person) { 
+                return res.status(404).json({ error : 'No valid token found.'});
+            }
             if (!person.accounts.local) { // if person doesn't have a local account: add a local account with password
                 person.accounts.local = { "password": req.body.pw };
             } else { // if person has local account: update password
@@ -456,7 +458,10 @@ exports.resetPassword = function(req, res, next) {
 
                 Mail.sendLocal(person.email, "[GIMMI] Uw wachtwoord werd gewijzigd", "<p>Je ontvangt deze mail omdat iemand een reset van je wachtwoord uitgevoerd heeft op http://www.gimmi.be .<br /> " +
                 "<br />Als je zelf geen wachtwoord reset hebt uitgevoerd, gelieve ons zo snel mogelijk te contacteren op info@gimmi.be .");
-                res.status(200).json(person);
+                res.status(200).json({
+                    email: person.email,
+                    usedToken: req.params.token
+                });
             });
         });
 
