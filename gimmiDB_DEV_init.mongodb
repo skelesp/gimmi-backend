@@ -41,9 +41,48 @@ db.people.insert([
 ]);
 
 // Add wishes for user
-db.wishes.insert(
+db.wishes.insert([
   {
-    "title" : "Test on dev",
+    "title" : "Ontvantgen wens",
+    "price" : 100,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141384,
+        "public_id" : "wish_images/59a9dc8c6282ae0011ae848f"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1,
+    "closure": {
+      "reason": "verjaardag"
+    }
+  },
+  {
+    "title" : "Test 1 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540847984,
+        "public_id" : "wish_images/5945a066c879a7001138ab39"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId("5f229c32d19589f8b835e79a"),
+    "amountWanted" : 1
+  },
+  {
+    "title" : "Test 2 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540847984,
+        "public_id" : "wish_images/595ec528de25520011403df8"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1
+  },
+  {
+    "title" : "Test 3 on dev",
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
@@ -53,8 +92,74 @@ db.wishes.insert(
     "receiver" : ObjectId(userId),
     "createdBy" : ObjectId(userId),
     "amountWanted" : 1
-}
-);
+  },
+  {
+    "title" : "Test 4 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141384,
+        "public_id" : "wish_images/59a9dcc96282ae0011ae8490"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1,
+    "reservation": {
+      "handoverDate": new Date()
+    }
+  },
+  {
+    "title" : "Test 5 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141383,
+        "public_id" : "wish_images/59ac83c2a922200011e2c7aa"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1,
+    "closure": {
+      "reason": "verjaardag"
+    }
+  },
+  {
+    "title" : "Test 6 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+         "version" : 1540141384,
+        "public_id" : "wish_images/59b590507264010012417e8a"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1
+  },
+  {
+    "title" : "Test 7 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540847985,
+        "public_id" : "wish_images/59b597d67264010012417e96"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1
+  },
+  {
+    "title" : "Test 8 on dev",
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141383,
+        "public_id" : "wish_images/59b5988e7264010012417e98"
+    },
+    "receiver" : ObjectId(userId),
+    "createdBy" : ObjectId(userId),
+    "amountWanted" : 1
+  }
+]);
 
 // Query wishes for user
 db.wishes.find({receiver : ObjectId(userId)});
