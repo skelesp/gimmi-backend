@@ -36,6 +36,28 @@ db.people.insert([
     "local": {
       "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
     }
+  },
+  "extraInfo" : {
+      "dislikes" : [ 
+          {
+              "text" : "Keukengerief"
+          }
+      ],
+      "likes" : [ 
+          {
+              "text" : "PS4 games"
+          }, 
+          {
+              "text" : "Gezelschapspelen"
+          }, 
+          {
+              "url" : "https://www.belgunique.be",
+              "text" : "Lokale producten van Belgunique"
+          }, 
+          {
+              "text" : "Cadeaubon Decathlon"
+          }
+      ]
   }
 }
 ]);
