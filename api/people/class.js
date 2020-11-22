@@ -69,26 +69,26 @@ exports.register = function (req, res, next) {
 // Get a person by ID
 exports.getByID = function (req, res, next) {
     if (req.authenticatedUser) {
-        if (req.params.id === req.authenticatedUser._id) { // Check if the requesting user is the same as the requested person
-            Person.findOne({ _id: req.params.id }, function (err, person) {
-                if (err) {
-                    return res.status(500).json({
-                        error: "The query could not be fulfilled on the server."
-                    })
-                }
-                if (person) { // person found
+        Person.findOne({ _id: req.params.id }, function (err, person) {
+            if (err) {
+                return res.status(500).json({
+                    error: "The query could not be fulfilled on the server."
+                })
+            }
+            if (person) { // person found
+                if (req.params.id === req.authenticatedUser._id) { // Check if the requesting user is the same as the requested person
                     res.status(200).json(person);
-                } else {
-                    res.status(404).json({
-                        error: "Person not found."
-                    });
+                } else { // User is not authorised to view this user
+                    personWithoutAccountInfo = person.toObject();
+                    delete personWithoutAccountInfo.accounts;
+                    res.status(200).json(personWithoutAccountInfo)
                 }
-            });
-        } else { // User is not authorised to view this user
-            res.status(403).json({
-                error: "403 - User tries to view/edit another user. This is forbidden."
-            });
-        }       
+            } else {
+                res.status(404).json({
+                    error: "Person not found."
+                });
+            }
+        });       
     } else {
         res.status(401).json({
             error: "401 - User is not authenticated."
