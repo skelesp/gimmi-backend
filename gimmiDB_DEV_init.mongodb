@@ -12,10 +12,14 @@ db.people.drop();
 db.wishes.drop();
 
 // Add an initial user
-var userId = "5f0207e39a554680bebb93e7";
+var testUserId = "5f0207e39a554680bebb93e7";
+var user2Id = "5f229c32d19589f8b835e79a";
+var futureDate = new Date(2030, 12, 31);
+var pastDate = new Date(2020, 8, 7);
+
 db.people.insert([
   {
-    "_id" : ObjectId(userId),
+    "_id" : ObjectId(testUserId),
     "firstName": "Test",
     "lastName": "Test",
     "email": "testuser@test.be",
@@ -27,7 +31,7 @@ db.people.insert([
     }
   },
   {
-  "_id": ObjectId("5f229c32d19589f8b835e79a"),
+  "_id": ObjectId(user2Id),
   "firstName": "Stijn",
   "lastName": "Beeckmans",
   "email": "stijn.beeckmans@gmail.com",
@@ -72,116 +76,295 @@ db.wishes.insert([
         "version" : 1540141384,
         "public_id" : "wish_images/59a9dc8c6282ae0011ae848f"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
     "amountWanted" : 1,
     "closure": {
       "reason": "verjaardag"
     }
   },
   {
-    "title" : "Test 1 on dev",
-    "price" : 12600,
-    "url" : "www.google.com",
-    "image" : {
-        "version" : 1540847984,
-        "public_id" : "wish_images/5945a066c879a7001138ab39"
-    },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId("5f229c32d19589f8b835e79a"),
-    "amountWanted" : 1
-  },
-  {
-    "title" : "Test 2 on dev",
+    "title" : "bannerscenario 1a 'no banner'", // state = open, testuser is receiver, testuser is creator
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
         "version" : 1540847984,
         "public_id" : "wish_images/595ec528de25520011403df8"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
     "amountWanted" : 1
   },
   {
-    "title" : "Test 3 on dev",
+    "title" : "bannerscenario 1b 'no banner'", // state = open, testuser is receiver, testuser is not creator
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
-        "version" : 1540141384,
-        "public_id" : "wish_images/59a9dc8c6282ae0011ae848f"
+        "version" : 1540847984,
+        "public_id" : "wish_images/5945a066c879a7001138ab39"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(user2Id),
     "amountWanted" : 1
   },
   {
-    "title" : "Test 4 on dev",
+    "title" : "bannerscenario 2 'no banner'", // state = open, testuser is not receiver, testuser is not creator
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
         "version" : 1540141384,
         "public_id" : "wish_images/59a9dcc96282ae0011ae8490"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(user2Id),
+    "amountWanted" : 1
+  },
+  {
+    "title" : "bannerscenario 3 'jouw idee'", // state = open, testuser is not receiver, testuser is creator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141384,
+        "public_id" : "wish_images/59a9dcc96282ae0011ae8490"
+    },
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1
+  },
+  {
+    "title" : "bannerscenario 4a 'jouw reservatie'", // state = reserved, testuser is reservator, testuser is receiver
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540847984,
+        "public_id" : "wish_images/595ec528de25520011403df8"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
     "amountWanted" : 1,
-    "reservation": {
-      "handoverDate": new Date()
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(testUserId),
+        "reservationDate" : new Date(),
+        "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
     }
   },
   {
-    "title" : "Test 5 on dev",
+    "title" : "bannerscenario 4b 'jouw reservatie'", // state = reserved, testuser is reservator, testuser is not receiver
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540847984,
+        "public_id" : "wish_images/595ec528de25520011403df8"
+    },
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(testUserId),
+        "reservationDate" : new Date(),
+        "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
+    }
+  },
+  {
+    "title" : "bannerscenario 5 'no banner'", // state = reserved, testuser is receiver, testuser is not reservator
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
         "version" : 1540141383,
-        "public_id" : "wish_images/59ac83c2a922200011e2c7aa"
+        "public_id" : "wish_images/59b590507264010012417e8a"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
     "amountWanted" : 1,
-    "closure": {
-      "reason": "verjaardag"
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(user2Id),
+        "reservationDate" : new Date(),
+        "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
     }
   },
   {
-    "title" : "Test 6 on dev",
+    "title" : "bannerscenario 6 'gereserveerd'", // state = reserved, testuser is not receiver, testuser is not reservator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141383,
+        "public_id" : "wish_images/59b590507264010012417e8a"
+    },
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(user2Id),
+        "reservationDate" : new Date(),
+        "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
+    }
+  },
+  {
+    "title" : "bannerscenario 7 'ontvangen'", // state = received, testuser is not reservator
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
          "version" : 1540141384,
         "public_id" : "wish_images/59b590507264010012417e8a"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
-    "amountWanted" : 1
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(user2Id),
+        "reservationDate" : new Date(),
+        "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
+    }
   },
   {
-    "title" : "Test 7 on dev",
+    "title" : "bannerscenario 8 'jouw cadeau'", // state = received, testuser is reservator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+         "version" : 1540141384,
+        "public_id" : "wish_images/59b590507264010012417e8a"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(testUserId),
+        "reservationDate" : new Date(),
+        "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
+    }
+  },
+  {
+    "title" : "bannerscenario 9 'wens vervuld'", // state = fulfilled, testuser is not reservator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+         "version" : 1540141384,
+        "public_id" : "wish_images/59b597d67264010012417e96"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "reservationDate" : new Date(),
+        "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
+        "amount" : 1,
+        "reservedBy" : ObjectId(user2Id)
+    },
+    "giftFeedback" : {
+        "_id" : ObjectId("5c7273b89585f00014fb36f6"),
+        "satisfaction" : "Blij",
+        "receivedOn" : ISODate("2019-02-22T10:36:24.119Z"),
+        "message" : "Nog een test vanop testomgeving",
+        "putBackOnList" : true
+    },
+    "closure" : {
+        "closedBy" : ObjectId(testUserId),
+        "reason" : "Cadeau ontvangen",
+        "closedOn" : new Date()
+    }
+  },
+  {
+    "title" : "bannerscenario 10 'jouw cadeau'", // state = fulfilled, testuser is reservator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+         "version" : 1540141384,
+        "public_id" : "wish_images/59b590507264010012417e8a"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "reservationDate" : new Date(),
+        "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
+        "amount" : 1,
+        "reservedBy" : ObjectId(testUserId)
+    },
+    "giftFeedback" : {
+        "_id" : ObjectId("5c7273b89585f00014fb36f6"),
+        "satisfaction" : "Blij",
+        "receivedOn" : ISODate("2019-02-22T10:36:24.119Z"),
+        "message" : "Nog een test vanop testomgeving",
+        "putBackOnList" : true
+    },
+    "closure" : {
+        "closedBy" : ObjectId(testUserId),
+        "reason" : "Cadeau ontvangen",
+        "closedOn" : new Date()
+    }
+  },
+  {
+    "title" : "afgesloten wens", 
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141383,
+        "public_id" : "wish_images/59ac83c2a922200011e2c7aa"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "closure": {
+      "reason": "verjaardag"
+    }
+  },
+  {
+    "title" : "voor Stijn door test",
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
         "version" : 1540847985,
         "public_id" : "wish_images/59b597d67264010012417e96"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(testUserId),
     "amountWanted" : 1
   },
   {
-    "title" : "Test 8 on dev",
+    "title" : "voor Stijn",
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
         "version" : 1540141383,
         "public_id" : "wish_images/59b5988e7264010012417e98"
     },
-    "receiver" : ObjectId(userId),
-    "createdBy" : ObjectId(userId),
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(user2Id),
     "amountWanted" : 1
+  },
+  {
+    "title" : "Reservatie zonder handoverDate",
+    "price" : 20,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540847984,
+        "public_id" : "wish_images/595ec528de25520011403df8"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "reservationDate" : new Date(),
+        "amount" : 1,
+        "reservedBy" : ObjectId(user2Id)
+    }
   }
 ]);
 
 // Query wishes for user
-db.wishes.find({receiver : ObjectId(userId)});
+db.wishes.find({receiver : ObjectId(testUserId)});
