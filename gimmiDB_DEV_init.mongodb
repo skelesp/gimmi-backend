@@ -14,6 +14,7 @@ db.wishes.drop();
 // Add an initial user
 var testUserId = "5f0207e39a554680bebb93e7";
 var user2Id = "5f229c32d19589f8b835e79a";
+var userWithoutListId = "5f229c32d19589f8b835e79d"
 var futureDate = new Date(2030, 12, 31);
 var pastDate = new Date(2020, 8, 7);
 
@@ -62,6 +63,18 @@ db.people.insert([
               "text" : "Cadeaubon Decathlon"
           }
       ]
+  }
+},
+{
+  "_id" : ObjectId(userWithoutListId),
+  "firstName": "Test",
+  "lastName": "Lege wishlist",
+  "email": "legewishlist@test.be",
+  "birthday": "1988-02-15T22:00:00.000Z",
+  "accounts": {
+    "local": {
+      "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
+    }
   }
 }
 ]);
