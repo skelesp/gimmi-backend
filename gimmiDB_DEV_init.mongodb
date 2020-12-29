@@ -14,7 +14,8 @@ db.wishes.drop();
 // Add an initial user
 var testUserId = "5f0207e39a554680bebb93e7";
 var user2Id = "5f229c32d19589f8b835e79a";
-var userWithoutListId = "5f229c32d19589f8b835e79d"
+var userWithoutListId = "5f229c32d19589f8b835e79d";
+var unknownUserId = "5f229c32d19589f8b835e80a"
 var futureDate = new Date(2030, 12, 31);
 var pastDate = new Date(2020, 8, 7);
 
@@ -375,6 +376,44 @@ db.wishes.insert([
         "reservationDate" : new Date(),
         "amount" : 1,
         "reservedBy" : ObjectId(user2Id)
+    }
+  },
+  {
+    "title" : "Scenario 5 'no banner' met onbekende reservator", // state = reserved, testuser is receiver, testuser is not reservator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141383,
+        "public_id" : "wish_images/59b590507264010012417e8a"
+    },
+    "receiver" : ObjectId(testUserId),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(unknownUserId),
+        "reservationDate" : new Date(),
+        "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
+    }
+  },
+  {
+    "title" : "Scenario 6 'gereserveerd' met onbekende reservator", // state = reserved, testuser is not receiver, testuser is not reservator
+    "price" : 12600,
+    "url" : "www.google.com",
+    "image" : {
+        "version" : 1540141383,
+        "public_id" : "wish_images/59b590507264010012417e8a"
+    },
+    "receiver" : ObjectId(user2Id),
+    "createdBy" : ObjectId(testUserId),
+    "amountWanted" : 1,
+    "reservation" : {
+        "reason" : "Zomaar...",
+        "amount" : 1,
+        "reservedBy" : ObjectId(unknownUserId),
+        "reservationDate" : new Date(),
+        "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
     }
   }
 ]);
