@@ -85,7 +85,7 @@ db.wishes.insert([
   {
     "title" : "Ontvantgen wens",
     "price" : 100,
-    "url" : "www.google.com",
+    "url" : "https://www.google.com",
     "image" : {
         "version" : 1540141384,
         "public_id" : "wish_images/59a9dc8c6282ae0011ae848f"
@@ -100,7 +100,7 @@ db.wishes.insert([
   {
     "title" : "bannerscenario 1a 'no banner'", // state = open, testuser is receiver, testuser is creator
     "price" : 12600,
-    "url" : "www.google.com",
+    "url" : "https://www.google.com",
     "image" : {
         "version" : 1540847984,
         "public_id" : "wish_images/595ec528de25520011403df8"
