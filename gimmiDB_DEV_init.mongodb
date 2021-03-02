@@ -101,6 +101,9 @@ db.wishes.insert([
     "title" : "bannerscenario 1a 'no banner'", // state = open, testuser is receiver, testuser is creator
     "price" : 12600,
     "url" : "https://www.google.com",
+    "color" : "geel",
+    "size" : "xl",
+    "description" : "Dit is een test \n \n testje.", 
     "image" : {
         "version" : 1540847984,
         "public_id" : "wish_images/595ec528de25520011403df8"
