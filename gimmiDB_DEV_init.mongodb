@@ -19,7 +19,7 @@ var unknownUserId = "5f229c32d19589f8b835e80a"
 var futureDate = new Date(2030, 12, 31);
 var pastDate = new Date(2020, 8, 7);
 
-db.people.insert([
+db.people.insertMany([
   {
     "_id" : ObjectId(testUserId),
     "firstName": "Test",
