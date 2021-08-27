@@ -95,7 +95,10 @@ db.wishes.insert([
     "amountWanted" : 1,
     "closure": {
       "reason": "verjaardag"
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 1a 'no banner'", // state = open, testuser is receiver, testuser is creator
@@ -110,7 +113,10 @@ db.wishes.insert([
     },
     "receiver" : ObjectId(testUserId),
     "createdBy" : ObjectId(testUserId),
-    "amountWanted" : 1
+    "amountWanted" : 1,
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 1b 'no banner'", // state = open, testuser is receiver, testuser is not creator
@@ -122,7 +128,10 @@ db.wishes.insert([
     },
     "receiver" : ObjectId(testUserId),
     "createdBy" : ObjectId(user2Id),
-    "amountWanted" : 1
+    "amountWanted" : 1,
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 2 'no banner'", // state = open, testuser is not receiver, testuser is not creator
@@ -134,7 +143,10 @@ db.wishes.insert([
     },
     "receiver" : ObjectId(user2Id),
     "createdBy" : ObjectId(user2Id),
-    "amountWanted" : 1
+    "amountWanted" : 1,
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 3 'jouw idee'", // state = open, testuser is not receiver, testuser is creator
@@ -146,7 +158,10 @@ db.wishes.insert([
     },
     "receiver" : ObjectId(user2Id),
     "createdBy" : ObjectId(testUserId),
-    "amountWanted" : 1
+    "amountWanted" : 1,
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 4a 'jouw reservatie'", // state = reserved, testuser is reservator, testuser is receiver
@@ -165,7 +180,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(testUserId),
         "reservationDate" : new Date(),
         "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 4b 'jouw reservatie'", // state = reserved, testuser is reservator, testuser is not receiver
@@ -184,10 +202,13 @@ db.wishes.insert([
         "reservedBy" : ObjectId(testUserId),
         "reservationDate" : new Date(),
         "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
-    "title" : "bannerscenario 5 'no banner'", // state = reserved, testuser is receiver, testuser is not reservator
+    "title" : "bannerscenario 5 'no banner' (incognito)", // state = reserved, testuser is receiver, testuser is not reservator
     "price" : 12600,
     "url" : "www.google.com",
     "image" : {
@@ -203,7 +224,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(user2Id),
         "reservationDate" : new Date(),
         "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 6 'gereserveerd'", // state = reserved, testuser is not receiver, testuser is not reservator
@@ -222,7 +246,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(user2Id),
         "reservationDate" : new Date(),
         "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 7 'ontvangen'", // state = received, testuser is not reservator
@@ -241,7 +268,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(user2Id),
         "reservationDate" : new Date(),
         "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 8 'ontvangen'", // state = received, testuser is not reservator
@@ -260,7 +290,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(user2Id),
         "reservationDate" : new Date(),
         "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 9 'jouw cadeau'", // state = received, testuser is reservator
@@ -279,7 +312,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(testUserId),
         "reservationDate" : new Date(),
         "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 10 'wens vervuld'", // state = fulfilled, testuser is not reservator
@@ -310,7 +346,10 @@ db.wishes.insert([
         "closedBy" : ObjectId(testUserId),
         "reason" : "Cadeau ontvangen",
         "closedOn" : new Date()
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "bannerscenario 11 'jouw cadeau'", // state = fulfilled, testuser is reservator
@@ -341,7 +380,10 @@ db.wishes.insert([
         "closedBy" : ObjectId(testUserId),
         "reason" : "Cadeau ontvangen",
         "closedOn" : new Date()
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "afgesloten wens", 
@@ -356,7 +398,10 @@ db.wishes.insert([
     "amountWanted" : 1,
     "closure": {
       "reason": "verjaardag"
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "voor Stijn door test",
@@ -368,7 +413,10 @@ db.wishes.insert([
     },
     "receiver" : ObjectId(user2Id),
     "createdBy" : ObjectId(testUserId),
-    "amountWanted" : 1
+    "amountWanted" : 1,
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "voor Stijn",
@@ -380,7 +428,10 @@ db.wishes.insert([
     },
     "receiver" : ObjectId(user2Id),
     "createdBy" : ObjectId(user2Id),
-    "amountWanted" : 1
+    "amountWanted" : 1,
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "Reservatie zonder handoverDate",
@@ -398,7 +449,10 @@ db.wishes.insert([
         "reservationDate" : new Date(),
         "amount" : 1,
         "reservedBy" : ObjectId(user2Id)
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "Scenario 5 'no banner' met onbekende reservator", // state = reserved, testuser is receiver, testuser is not reservator
@@ -417,7 +471,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(unknownUserId),
         "reservationDate" : new Date(),
         "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   },
   {
     "title" : "Scenario 6 'gereserveerd' met onbekende reservator", // state = reserved, testuser is not receiver, testuser is not reservator
@@ -436,7 +493,10 @@ db.wishes.insert([
         "reservedBy" : ObjectId(unknownUserId),
         "reservationDate" : new Date(),
         "handoverDate": futureDate, // Reservatie moet in toekomst liggen voor status 'reserved'
-    }
+    },
+    "createdAt" : ISODate("2021-08-02T21:44:22.411Z"),
+    "updatedAt" : ISODate("2021-08-02T21:44:22.520Z"),
+    "__v" : 0
   }
 ]);
 
