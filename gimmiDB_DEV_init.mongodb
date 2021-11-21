@@ -30,7 +30,8 @@ db.people.insertMany([
       "local": {
         "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
       }
-    }
+    },
+    "createdAt" : ISODate("2020-06-07T18:29:53.000Z"),
   },
   {
   "_id": ObjectId(user2Id),
@@ -64,7 +65,8 @@ db.people.insertMany([
               "text" : "Cadeaubon Decathlon"
           }
       ]
-  }
+  },
+  "createdAt" : ISODate("2020-02-05T18:29:53.000Z"),
 },
 {
   "_id" : ObjectId(userWithoutListId),
@@ -76,7 +78,8 @@ db.people.insertMany([
     "local": {
       "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
     }
-  }
+  },
+  "createdAt" : ISODate("2021-04-04T18:29:53.000Z"),
 }
 ]);
 
@@ -260,12 +263,12 @@ db.wishes.insert([
         "public_id" : "wish_images/59b590507264010012417e8a"
     },
     "receiver" : ObjectId(user2Id),
-    "createdBy" : ObjectId(userWithoutListId),
+    "createdBy" : ObjectId(user2Id),
     "amountWanted" : 1,
     "reservation" : {
         "reason" : "Zomaar...",
         "amount" : 1,
-        "reservedBy" : ObjectId(user2Id),
+        "reservedBy" : ObjectId(userWithoutListId),
         "reservationDate" : new Date(),
         "handoverDate": pastDate, // Reservatie moet in verleden liggen voor status 'received'
     },
