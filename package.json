@@ -21,7 +21,7 @@
     "gulp-stylus": "^2.6.0",
     "gulp-uglify": "^2.0.0",
     "https": "^1.0.0",
-    "jsonwebtoken": "^7.4.3",
+    "jsonwebtoken": "^9.0.0",
     "jwt-simple": "^0.5.6",
     "lodash": "^4.17.15",
     "mongoose": "^5.10.8",
