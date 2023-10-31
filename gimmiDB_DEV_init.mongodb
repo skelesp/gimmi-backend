@@ -42,6 +42,11 @@ db.people.insertMany([
   "accounts": {
     "local": {
       "password": "$2a$10$AUqOL68zxQkyBKQM6zlHR.BSaunauOCIjsZbmzsUYvVUzBSxVZWXa"
+    },
+    "facebook" : {
+      "profile_pic" : "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=10155140325733512&height=50&width=50&ext=1642688317&hash=AeTSVrpxCQcRvc5YGyI",
+      "token" : "EAAVrnvwGtMABALnZC67ntzlXjuIoqJkIrFOJLo4rXABLZAzeGUP3ZCjZBqtYK2wXgHM5qgKNZBa3SlPHGmFf5kuw6VlCuXUGp1Tpm55OsoBV1UtKDXualwPreigVdx81dCBZCRF1AcmWBsZAiNe6b59fQZB89hygijmSx9wVFlUjx0SghIOBl4KQ",
+      "id" : "10155140325733512"
     }
   },
   "extraInfo" : {
